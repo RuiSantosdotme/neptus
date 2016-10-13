@@ -1,23 +1,25 @@
 package pt.lsts.neptus.autoplanner;
 import pt.lsts.neptus.console.ConsoleLayout;
+import pt.lsts.neptus.console.ConsolePanel;
+import pt.lsts.neptus.plugins.PluginDescription;
+import pt.lsts.neptus.plugins.Popup;
+import pt.lsts.neptus.plugins.Popup.POSITION;
 
 /**
- * @author You
+ * @author Equipa C - SEAI 2016
  *
  */
-@PluginDescription(name = "My Console Viz")
-@Popup(pos = POSITION.RIGHT, width = 200, height = 200, accelerator = ‘Y')
+@PluginDescription(name = "Sistema de planeamento e controlo de execução de  UAVs para aplicações em agricultura")
+@Popup(accelerator='Y',pos = POSITION.RIGHT, height=200, width = 200)
 @SuppressWarnings("serial")
 
-public class MyConsoleViz extends ConsolePanel {
+public class AutoPlanner extends ConsolePanel {
 
     /**
      * @param console
      */
-    public MyConsoleViz(ConsoleLayout console) {
-
+    public AutoPlanner(ConsoleLayout console) {
         super(console);
-
     }
 
     @Override
@@ -31,3 +33,4 @@ public class MyConsoleViz extends ConsolePanel {
     }
 
 }
+
