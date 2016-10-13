@@ -1,4 +1,45 @@
 package pt.lsts.neptus.autoplanner;
+import java.awt.Component;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JButton;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+/**/
+import java.awt.Dimension;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.text.BadLocationException;
+
+import com.google.common.eventbus.Subscribe;
+
+import net.miginfocom.swing.MigLayout;
+import pt.lsts.imc.Abort;
+import pt.lsts.imc.AcousticOperation;
+import pt.lsts.imc.AcousticOperation.OP;
+import pt.lsts.imc.IMCMessage;
+import pt.lsts.imc.TextMessage;
+import pt.lsts.neptus.comm.manager.imc.ImcMsgManager;
+import pt.lsts.neptus.comm.manager.imc.ImcSystem;
+import pt.lsts.neptus.comm.manager.imc.ImcSystemsHolder;
+import pt.lsts.neptus.comm.manager.imc.MessageDeliveryListener;
+import pt.lsts.neptus.console.notifications.Notification;
+import pt.lsts.neptus.i18n.I18n;
+import pt.lsts.neptus.plugins.NeptusProperty;
+import pt.lsts.neptus.types.vehicle.VehicleType.SystemTypeEnum;
+import pt.lsts.neptus.util.GuiUtils;
+import pt.lsts.neptus.util.conf.GeneralPreferences;
+/**/
+
 import pt.lsts.neptus.console.ConsoleLayout;
 import pt.lsts.neptus.console.ConsolePanel;
 import pt.lsts.neptus.plugins.PluginDescription;
@@ -24,7 +65,21 @@ public class AutoPlanner extends ConsolePanel {
 
     @Override
     public void initSubPanel() {
+        removeAll();
 
+        Action sendAbortAction = new AbstractAction(I18n.text("Send Abort")) {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                Abort abortMsg = new Abort();
+                send(abortMsg);
+            }
+        };
+
+        JButton sendAbort = new JButton(sendAbortAction);
+
+        add(sendAbort);
     }
 
     @Override
