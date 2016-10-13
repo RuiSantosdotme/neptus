@@ -16,5 +16,3 @@ For developers: please read [javadoc/overview-and-developers-guide.html](javadoc
 For more information check Neptus web site (http://www.lsts.pt/toolchain/neptus/).
 
 [![Build Status](https://travis-ci.org/LSTS/neptus.svg?branch=develop)](https://travis-ci.org/LSTS/neptus)
-
-t
