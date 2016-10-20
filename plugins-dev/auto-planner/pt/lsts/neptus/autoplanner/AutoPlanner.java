@@ -50,7 +50,7 @@ import pt.lsts.neptus.plugins.Popup.POSITION;
  * @author Equipa C - SEAI 2016
  *
  */
-@PluginDescription(name = "Sistema de planeamento e controlo de execução de  UAVs para aplicações em agricultura")
+@PluginDescription(name = "Auto Planner")
 @Popup(accelerator='Y',pos = POSITION.RIGHT, height=200, width = 200)
 @SuppressWarnings("serial")
 
