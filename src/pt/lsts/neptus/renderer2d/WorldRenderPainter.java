@@ -189,7 +189,7 @@ public class WorldRenderPainter implements Renderer2DPainter, MouseListener, Mou
     private boolean showOnScreenControls = true;
     private boolean drawWorldBoundaries = false;
     private boolean drawWorldMap = false;
-    private boolean useTransparency = true;
+    private boolean useTransparency = false;
 
     private StateRenderer2D renderer2D = null;
     private Renderer2DPainter postRenderPainter = null;
