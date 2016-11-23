@@ -116,6 +116,11 @@ public class MapEditor extends ConsolePanel implements StateRendererInteraction,
         MissionChangeListener, ConfigurationListener {
 
     private static final long serialVersionUID = 1L;
+    
+    public static int a;
+    
+    public static double lat, longi;
+    
 
     protected static ImageIcon handIcon = ImageUtils.createImageIcon("images/icons/hand.png");
     
@@ -428,8 +433,18 @@ public class MapEditor extends ConsolePanel implements StateRendererInteraction,
         intersectedObjects.clear();
         if (mousePoint == null || mg == null || renderer == null)
             return;
+        
+         a=0 ;
+         
+        
 
         LocationType loc = renderer.getRealWorldLocation(mousePoint);
+        
+        a= 1;
+        lat= loc.getLatitudeDegs();
+        longi= loc.getLongitudeDegs();
+        
+         
 
         for (AbstractElement elem : mg.getAllObjects()) {
             if (elem.containsPoint(loc, renderer)) {
@@ -545,7 +560,6 @@ public class MapEditor extends ConsolePanel implements StateRendererInteraction,
         return transNames;
     }
 
-    @Override
     public void mouseClicked(MouseEvent event, StateRenderer2D source) {
         if (currentInteraction != null) {
             currentInteraction.mouseClicked(event, source);

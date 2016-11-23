@@ -45,6 +45,7 @@ import pt.lsts.neptus.console.ConsolePanel;
 import pt.lsts.neptus.plugins.PluginDescription;
 import pt.lsts.neptus.plugins.Popup;
 import pt.lsts.neptus.plugins.Popup.POSITION;
+import pt.lsts.neptus.plugins.map.MapEditor;
 
 /**
  * @author Equipa C - SEAI 2016
@@ -73,7 +74,15 @@ public class AutoPlanner extends ConsolePanel {
             public void actionPerformed(ActionEvent e) {
 
                 Abort abortMsg = new Abort();
-                send(abortMsg);
+                send(abortMsg);                
+                System.out.println("------------------------------------------------------");
+                System.out.println("LATITUDE = "+ MapEditor.lat);
+                System.out.println("------------------------------------------------------");
+                System.out.println("LONGITUDE = "+ MapEditor.longi);
+                
+                
+
+               
             }
         };
 
