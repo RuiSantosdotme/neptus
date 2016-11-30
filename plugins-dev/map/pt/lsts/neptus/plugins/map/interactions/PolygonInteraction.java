@@ -46,6 +46,8 @@ import pt.lsts.neptus.types.coord.LocationType;
 import pt.lsts.neptus.types.map.MapType;
 import pt.lsts.neptus.types.map.PathElement;
 
+import pt.lsts.neptus.autoplanner.RealWorldPolygon;
+
 /**
  * @author zp
  *
@@ -58,6 +60,7 @@ public class PolygonInteraction extends InteractionAdapter {
     protected UndoManager undoManager = null;
     protected boolean fill = false;
     Vector<Point3d> pointsPolygon = new Vector<Point3d>();
+    RealWorldPolygon realCoordPolygon = new RealWorldPolygon();
     
     public PolygonInteraction(MapType pivot, UndoManager undoManager, boolean fill, ConsoleLayout console) {
         super(console);
@@ -92,7 +95,8 @@ public class PolygonInteraction extends InteractionAdapter {
         
         
         LocationType lt = source.getRealWorldLocation(event.getPoint());
-
+        realCoordPolygon.insertPoint(lt);
+        
         if (element == null) {
             element = new PathElement(pivot.getMapGroup(), pivot, lt);
             element.setFilled(fill);
@@ -117,6 +121,8 @@ public class PolygonInteraction extends InteractionAdapter {
             changeEvent.setSourceMap(pivot);
             pivot.warnChangeListeners(changeEvent);
         }
+        
+        realCoordPolygon.printfPolygon();
         
     }
     
