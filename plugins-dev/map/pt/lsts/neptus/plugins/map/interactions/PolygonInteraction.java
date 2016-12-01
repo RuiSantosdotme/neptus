@@ -57,7 +57,7 @@ public class PolygonInteraction extends InteractionAdapter {
     protected PathElement element = null;
     protected UndoManager undoManager = null;
     protected boolean fill = false;
-    Vector<Point3d> pontosPoligono = new Vector<Point3d>();
+    Vector<Point3d> pointsPolygon = new Vector<Point3d>();
     
     public PolygonInteraction(MapType pivot, UndoManager undoManager, boolean fill, ConsoleLayout console) {
         super(console);
@@ -99,7 +99,7 @@ public class PolygonInteraction extends InteractionAdapter {
             element.setShape(fill);
             pivot.addObject(element);
             element.addPoint(0,0,0, false);
-            pontosPoligono = element.getPoints();
+            pointsPolygon = element.getPoints();
             MapChangeEvent changeEvent = new MapChangeEvent(MapChangeEvent.OBJECT_ADDED);
             changeEvent.setChangedObject(element);
             changeEvent.setSourceMap(pivot);
@@ -110,7 +110,7 @@ public class PolygonInteraction extends InteractionAdapter {
                     source.getRealWorldLocation(event.getPoint()));
             element.addPoint(-offsets[1], -offsets[0], 0, false);
             
-            pontosPoligono = element.getPoints();
+            pointsPolygon = element.getPoints();
             
             MapChangeEvent changeEvent = new MapChangeEvent(MapChangeEvent.OBJECT_CHANGED);
             changeEvent.setChangedObject(element);
