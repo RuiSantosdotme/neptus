@@ -28,6 +28,7 @@ import pt.lsts.imc.AcousticOperation;
 import pt.lsts.imc.AcousticOperation.OP;
 import pt.lsts.imc.IMCMessage;
 import pt.lsts.imc.TextMessage;
+import pt.lsts.neptus.autoplanner.RealWorldPolygon.StartPosition;
 import pt.lsts.neptus.comm.manager.imc.ImcMsgManager;
 import pt.lsts.neptus.comm.manager.imc.ImcSystem;
 import pt.lsts.neptus.comm.manager.imc.ImcSystemsHolder;
@@ -46,6 +47,8 @@ import pt.lsts.neptus.plugins.PluginDescription;
 import pt.lsts.neptus.plugins.Popup;
 import pt.lsts.neptus.plugins.Popup.POSITION;
 import pt.lsts.neptus.plugins.map.MapEditor;
+
+import pt.lsts.neptus.plugins.map.interactions.*;
 
 /**
  * @author Equipa C - SEAI 2016
@@ -80,7 +83,7 @@ public class AutoPlanner extends ConsolePanel {
                 System.out.println("------------------------------------------------------");
                 System.out.println("LONGITUDE = "+ MapEditor.longi);
                 
-                
+                PolygonInteraction.realCoordPolygon.CreateGrid(100, 1, 1, 1, 0, 0, null, false, 1, 0);
 
                
             }

@@ -59,8 +59,8 @@ public class PolygonInteraction extends InteractionAdapter {
     protected PathElement element = null;
     protected UndoManager undoManager = null;
     protected boolean fill = false;
-    Vector<Point3d> pointsPolygon = new Vector<Point3d>();
-    RealWorldPolygon realCoordPolygon = new RealWorldPolygon();
+    public Vector<Point3d> pointsPolygon = new Vector<Point3d>();
+    public static RealWorldPolygon realCoordPolygon = new RealWorldPolygon();
     
     public PolygonInteraction(MapType pivot, UndoManager undoManager, boolean fill, ConsoleLayout console) {
         super(console);
