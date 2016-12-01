@@ -3,14 +3,19 @@ package pt.lsts.neptus.autoplanner;
 
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 import java.util.Date;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 import com.google.common.eventbus.Subscribe;
+import com.sun.corba.se.spi.orbutil.fsm.Action;
 
 import net.miginfocom.swing.MigLayout;
+import pt.lsts.imc.Abort;
 import pt.lsts.imc.IMCDefinition;
 import pt.lsts.imc.PlanControlState;
 import pt.lsts.imc.PlanDB;
@@ -24,6 +29,7 @@ import pt.lsts.neptus.i18n.I18n;
 import pt.lsts.neptus.plugins.NeptusProperty;
 import pt.lsts.neptus.plugins.NeptusProperty.LEVEL;
 import pt.lsts.neptus.plugins.PluginDescription;
+import pt.lsts.neptus.plugins.map.MapEditor;
 import pt.lsts.neptus.plugins.update.Periodic;
 import pt.lsts.neptus.util.DateTimeUtil;
 import pt.lsts.neptus.util.GuiUtils;
@@ -78,7 +84,31 @@ public class AutoPlanner extends ConsolePanel {
     private void initialize() {
         setSize(200, 200);
         this.setLayout(new MigLayout("ins 0"));
-        stateValueLabel = new JLabel();
+        
+        AbstractAction sendAbortAction = new AbstractAction(I18n.text("Send Abort")) {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                Abort abortMsg = new Abort();
+                send(abortMsg);                
+                System.out.println("------------------------------------------------------");
+                System.out.println("LATITUDE = "+ MapEditor.lat);
+                System.out.println("------------------------------------------------------");
+                System.out.println("LONGITUDE = "+ MapEditor.longi);
+                
+                
+
+               
+            }
+        };
+
+        JButton sendAbort = new JButton(sendAbortAction);
+
+        add(sendAbort);
+        
+        
+       /* stateValueLabel = new JLabel();
         stateValueLabel.setText("");
         stateLabel = new JLabel();
         stateLabel.setText("<html><b>" + I18n.text("BLABLABLABLABLABLABLA") + ": ");
@@ -101,7 +131,9 @@ public class AutoPlanner extends ConsolePanel {
 
         outcomeLabel = new JLabel(lastOutcome);
         this.add(outcomeTitleLabel);
-        this.add(outcomeLabel, "wrap");
+        this.add(outcomeLabel, "wrap");*/
+        
+        
 
       
     }
