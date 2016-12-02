@@ -43,10 +43,11 @@ import java.util.*;
  */
 public class RealWorldPolygon {
 
-    protected List<LocationType> polygonLL = null;
-    protected List<UTMCoordinates> polygonUTM = null;
+    private List<LocationType> polygonLL = null;
+    private List<UTMCoordinates> polygonUTM = null;
     final static float rad2deg = (float)(180 / Math.PI);
     final static float deg2rad = (float)(1.0 / rad2deg);
+    private List<UTMCoordinates> waypoints = null;
     
     /**
      * 
@@ -54,6 +55,7 @@ public class RealWorldPolygon {
     public RealWorldPolygon() {
         polygonLL = new ArrayList<LocationType>();
         polygonUTM = new ArrayList<UTMCoordinates>();
+        waypoints = new ArrayList<UTMCoordinates>();
     }
     
     public enum StartPosition {
@@ -100,7 +102,7 @@ public class RealWorldPolygon {
             maxy = Math.max(maxy, pnt.getLatitudeDegrees());
         }
 
-        return new Rect(maxy, minx, Math.abs(maxx - minx), Math.abs(miny - maxy));
+        return new Rect(minx, maxy, maxx, miny);
     }
     
     // polar x to rectangular
@@ -118,6 +120,49 @@ public class RealWorldPolygon {
         if (degN < 0)
             degN += 360;
         return (y + distance * Math.sin(degN * deg2rad));
+    }
+    
+    double offsetMtoLL(double dn) {
+
+        //Earth’s radius, sphere
+        double R=6378137;
+
+        //Coordinate offsets in radians
+        double dLat = dn/R;
+
+        //OffsetPosition, decimal degrees
+        double latO = dLat * 180/Math.PI;
+        
+        return latO;
+        
+    }
+    
+    public UTMCoordinates getIntersection(LineLLUTM l1, LineLLUTM l2) {
+        
+        double px, py;
+        
+        double x1 = l1.getP1().getLongitudeDegrees();
+        double y1 = l1.getP1().getLatitudeDegrees();
+        
+        double x2 = l1.getP2().getLongitudeDegrees();
+        double y2 = l1.getP2().getLatitudeDegrees();
+        
+        double x3 = l2.getP1().getLongitudeDegrees();
+        double y3 = l2.getP1().getLatitudeDegrees();
+        
+        double x4 = l2.getP2().getLongitudeDegrees();
+        double y4 = l2.getP2().getLatitudeDegrees();
+        
+        if(((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4)) == 0) {
+            return null;
+        } else {
+        
+            px = ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
+            py = ((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
+            
+            return new UTMCoordinates(py, px);
+        }
+        
     }
     
     public List<UTMCoordinates> CreateGrid(double altitude, double distance, double spacing, double angle, double overshoot1,double overshoot2, StartPosition startpos, boolean shutter, float minLaneSeparation, float leadin)
@@ -162,75 +207,117 @@ public class RealWorldPolygon {
         double diagdist = area.getDiagDistance();
 
         // somewhere to store out generated lines
-        List<LineLatLng> grid = new ArrayList<LineLatLng>();
+        List<LineLLUTM> grid = new ArrayList<LineLLUTM>();
         // number of lines we need
         int lines = 0;
-
-        // get start point middle
-        double x = area.getMidWidth();
-        double y = area.getMidHeight();
-
-        //Deve ter a haver com a interface grafica, fica comentado por agora
-        //addtomap(new utmpos(x, y, utmzone),"Base");
-
         
-        //Deve ter a haver com a interface grafica, fica comentado por agora 
-        // get left extent
-        double xb1 = x;
-        double yb1 = y;
+        double auxspacing = offsetMtoLL(spacing);
         
-        // to the left
-        xb1=newposx(xb1, angle - 90, diagdist / 2 + distance);
-        // backwards
-        yb1=newposy(yb1, angle + 180, diagdist / 2 + distance);
-
-//        utmpos left = new utmpos(xb1, yb1, utmzone);
-//
-//        addtomap(left, "left");
-
-        // get right extent
-        double xb2 = x;
-        double yb2 = y;
-        // to the right
-        xb2=newposx(xb2, angle + 90, diagdist / 2 + distance);
-        // backwards
-        yb2=newposy(yb2, angle + 180, diagdist / 2 + distance);
-
-//        utmpos right = new utmpos(xb2, yb2, utmzone);
-//
-//        addtomap(right,"right");
-
-        // set start point to left hand side
-        x = xb1;
-        y = yb1;
-
-        // draw the outergrid, this is a grid that cover the entire area of the rectangle plus more.
-        while (lines < ((diagdist + distance * 2) / distance))
-        {
-            // copy the start point to generate the end point
-            double nx = x;
-            double ny = y;
-            nx = newposx(nx, angle, diagdist + distance*2);
-            ny = newposx(ny, angle, diagdist + distance*2);
-
-            LineLatLng line = new LineLatLng(new UTMCoordinates(y, x), new UTMCoordinates(ny, nx), new UTMCoordinates(y, x));
+        for (double auxrising = area.Bottom; auxrising <= area.Top; auxrising += auxspacing) {
+            
+            LineLLUTM line = new LineLLUTM(new UTMCoordinates(auxrising, area.Right), new UTMCoordinates(auxrising, area.Left));
             grid.add(line);
-
-           // addtomap(line);
-
-            x = newposx(x, angle + 90, distance);
-            y = newposx(y, angle + 90, distance);
             lines++;
+            
         }
+        
+        LineLLUTM linePolygon = null;
+        UTMCoordinates inter = null;
+        
+        for (int i = 0; i < polygonUTM.size(); i++) {
+            
+            if(i == polygonUTM.size()-1)
+                linePolygon = new LineLLUTM(polygonUTM.get(i), polygonUTM.get(0));
+            else
+                linePolygon = new LineLLUTM(polygonUTM.get(i), polygonUTM.get(i+1));
+            
+            
+            for(int j = 0; j < grid.size(); j++) {
+                
+                inter = getIntersection(linePolygon, grid.get(j));
+                
+                if((inter.getLatitudeDegrees() > area.Bottom) && (inter.getLatitudeDegrees() < area.Top) && (inter.getLongitudeDegrees() < area.Right) && (inter.getLongitudeDegrees() > area.Left)) {
+                    waypoints.add(inter);
+                }
+                
+            }
+           
+            
+        }
+        
+        
+        
+        
 
-        // find intersections with our polygon
-
-        // store lines that dont have any intersections
-        List<LineLatLng> remove = new ArrayList<LineLatLng>();
-
-        int gridno = grid.size();
-
-        // cycle through our grid
+//        // get start point middle
+//        double x = area.getMidWidth();
+//        double y = area.getMidHeight();
+//
+//        //Deve ter a haver com a interface grafica, fica comentado por agora
+//        //addtomap(new utmpos(x, y, utmzone),"Base");
+//
+//        
+//        //Deve ter a haver com a interface grafica, fica comentado por agora 
+//        // get left extent
+//        double xb1 = x;
+//        double yb1 = y;
+//        
+//        // to the left
+//        xb1=newposx(xb1, angle - 90, diagdist / 2 + distance);
+//        yb1=newposy(yb1, angle - 90, diagdist / 2 + distance);
+//        // backwards
+//        xb1=newposx(xb1, angle + 180, diagdist / 2 + distance);
+//        yb1=newposy(yb1, angle + 180, diagdist / 2 + distance);
+//
+////        utmpos left = new utmpos(xb1, yb1, utmzone);
+////
+////        addtomap(left, "left");
+//
+//        // get right extent
+//        double xb2 = x;
+//        double yb2 = y;
+//        // to the right
+//        xb2=newposx(xb2, angle + 90, diagdist / 2 + distance);
+//        yb2=newposy(yb2, angle + 90, diagdist / 2 + distance);
+//        // backwards
+//        xb2=newposx(xb2, angle + 180, diagdist / 2 + distance);
+//        yb2=newposy(yb2, angle + 180, diagdist / 2 + distance);
+//
+////        utmpos right = new utmpos(xb2, yb2, utmzone);
+////
+////        addtomap(right,"right");
+//
+//        // set start point to left hand side
+//        x = xb1;
+//        y = yb1;
+//
+//        // draw the outergrid, this is a grid that cover the entire area of the rectangle plus more.
+//        while (lines < ((diagdist + distance * 2) / distance))
+//        {
+//            // copy the start point to generate the end point
+//            double nx = x;
+//            double ny = y;
+//            nx = newposx(nx, angle, diagdist + distance*2);
+//            ny = newposy(ny, angle, diagdist + distance*2);
+//
+//            LineLatLng line = new LineLatLng(new UTMCoordinates(y, x), new UTMCoordinates(ny, nx), new UTMCoordinates(y, x));
+//            grid.add(line);
+//
+//           // addtomap(line);
+//
+//            x = newposx(x, angle + 90, distance);
+//            y = newposx(y, angle + 90, distance);
+//            lines++;
+//        }
+//
+//        // find intersections with our polygon
+//
+//        // store lines that dont have any intersections
+//        List<LineLatLng> remove = new ArrayList<LineLatLng>();
+//
+//        int gridno = grid.size();
+//
+//        // cycle through our grid
 //        for (int a = 0; a < gridno; a++)
 //        {
 //            double closestdistance = double.MaxValue;
@@ -476,14 +563,6 @@ public class RealWorldPolygon {
 //        return ans;
         return null;
     }
-    
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        // TODO Auto-generated method stub
-
-    }
 
 }

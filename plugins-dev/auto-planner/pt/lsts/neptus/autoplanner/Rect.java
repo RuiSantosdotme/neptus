@@ -48,13 +48,14 @@ public class Rect {
         this.Right = 0;
         this.Bottom = 0;
     }
-
-    public Rect(double Left, double Top, double Width, double Height) {
+    
+    public Rect(double Left, double Top, double Right, double Bottom) {
         this.Left = Left;
         this.Top = Top;
-        this.Right = Left + Width;
-        this.Bottom = Top + Height;
+        this.Right = Right;
+        this.Bottom = Bottom;
     }
+
     
     public double getWidth() {
         return Right - Left;

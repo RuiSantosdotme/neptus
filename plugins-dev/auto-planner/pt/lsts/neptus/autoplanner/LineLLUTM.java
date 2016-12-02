@@ -37,31 +37,27 @@ import pt.lsts.neptus.types.coord.UTMCoordinates;
  * @author grifo
  *
  */
-public class LineLatLng {
+public class LineLLUTM {
     
     // start of line
     private UTMCoordinates p1;
     // end of line
     private UTMCoordinates p2;
-    // used as a base for grid along line (initial setout)
-    private UTMCoordinates basepnt;
     
     /**
      * 
      */
-    public LineLatLng() {
+    public LineLLUTM() {
         this.p1 = null;
         this.p2 = null;
-        this.basepnt = null;
     }
     
     /**
      * 
      */
-    public LineLatLng(UTMCoordinates p1, UTMCoordinates p2, UTMCoordinates basepnt) {
+    public LineLLUTM(UTMCoordinates p1, UTMCoordinates p2) {
         this.p1 = p1;
         this.p2 = p2;
-        this.basepnt = basepnt;
     }
     
     public UTMCoordinates getP1() {
@@ -69,9 +65,6 @@ public class LineLatLng {
     }
     public UTMCoordinates getP2() {
         return p2;
-    }
-    public UTMCoordinates getBasepnt() {
-        return basepnt;
     }
 
 }

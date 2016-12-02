@@ -83,7 +83,7 @@ public class AutoPlanner extends ConsolePanel {
                 System.out.println("------------------------------------------------------");
                 System.out.println("LONGITUDE = "+ MapEditor.longi);
                 
-                PolygonInteraction.realCoordPolygon.CreateGrid(100, 1, 1, 1, 0, 0, null, false, 1, 0);
+                PolygonInteraction.realCoordPolygon.CreateGrid(100, 0, 100, 0, 0, 0, null, false, 0, 0);
 
                
             }
