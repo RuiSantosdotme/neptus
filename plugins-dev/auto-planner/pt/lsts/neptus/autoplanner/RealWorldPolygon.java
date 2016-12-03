@@ -47,7 +47,7 @@ public class RealWorldPolygon {
     private List<UTMCoordinates> polygonUTM = null;
     final static float rad2deg = (float)(180 / Math.PI);
     final static float deg2rad = (float)(1.0 / rad2deg);
-    private List<UTMCoordinates> waypoints = null;
+    private List<WaypointPolygon> waypoints = null;
     
     /**
      * 
@@ -55,7 +55,7 @@ public class RealWorldPolygon {
     public RealWorldPolygon() {
         polygonLL = new ArrayList<LocationType>();
         polygonUTM = new ArrayList<UTMCoordinates>();
-        waypoints = new ArrayList<UTMCoordinates>();
+        waypoints = new ArrayList<WaypointPolygon>();
     }
     
     public enum StartPosition {
@@ -237,7 +237,7 @@ public class RealWorldPolygon {
                 inter = getIntersection(linePolygon, grid.get(j));
                 
                 if((inter.getLatitudeDegrees() > area.Bottom) && (inter.getLatitudeDegrees() < area.Top) && (inter.getLongitudeDegrees() < area.Right) && (inter.getLongitudeDegrees() > area.Left)) {
-                    waypoints.add(inter);
+                    waypoints.add(new WaypointPolygon(inter, j));
                 }
                 
             }
