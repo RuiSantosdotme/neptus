@@ -3,12 +3,17 @@ import java.awt.Component;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.awt.event.ItemEvent;
 /**/
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
@@ -19,7 +24,12 @@ import java.util.List;
 import java.util.Random;
 
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.text.BadLocationException;
 
 import com.google.common.eventbus.Subscribe;
@@ -29,6 +39,7 @@ import pt.lsts.imc.Abort;
 import pt.lsts.imc.AcousticOperation;
 import pt.lsts.imc.AcousticOperation.OP;
 import pt.lsts.imc.IMCMessage;
+import pt.lsts.imc.PlanControlState;
 import pt.lsts.imc.TextMessage;
 import pt.lsts.neptus.autoplanner.RealWorldPolygon.StartPosition;
 import pt.lsts.neptus.comm.manager.imc.ImcMsgManager;
@@ -64,12 +75,38 @@ public class AutoPlanner extends ConsolePanel {
 
     /**
      * @param console
+     * 
+     * 
      */
     
+    
+    private JLabel stateValueLabel;
+    private JLabel stateLabel;
+    private JLabel planIdValueLabel;
+    private JLabel planIdLabel;
+    private JLabel nodeIdValueLabel;
+    private JLabel nodeIdLabel;
+    private JLabel outcomeTitleLabel;
+    private JLabel outcomeLabel;
+    private JLabel outcomeTitleLabel1;
+    private JLabel outcomeLabel1, AltIdValueLabel,AltIdLabel, AngIdLabel, AngIdValueLabel ;
+    private PlanControlState.STATE state;
+    private String planId = "";
+    private String nodeId = "";
+    private String lastOutcome = "<html><font color='0x666666'>" + I18n.text("N/A") + "</font>";
+    private int nodeTypeImcId = -1;
+    private long nodeStarTimeMillisUTC = -1;
+    private long nodeEtaSec = -1;
+    private long lastUpdated = -1;
+
+    
     //Variaveis globais para aceder à opçao escolhida
-    public static String selectedCam, selectedVeic, selectedRes ;
+    public static String selectedCam, selectedVeic, selectedRes, height, angle ;
+    
+    public static int highInt, angleInt;
     
     
+   
     
     public AutoPlanner(ConsoleLayout console) {
         super(console);
@@ -77,37 +114,59 @@ public class AutoPlanner extends ConsolePanel {
 
     @Override
     public void initSubPanel() {
-        removeAll();
-
-        Action sendAbortAction = new AbstractAction(I18n.text("Send Abort")) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                Abort abortMsg = new Abort();
-                send(abortMsg);                
-                System.out.println("------------------------------------------------------");
-                System.out.println("LATITUDE = "+ MapEditor.lat);
-                System.out.println("------------------------------------------------------");
-                System.out.println("LONGITUDE = "+ MapEditor.longi);
-                
-                PolygonInteraction.realCoordPolygon.CreateGrid(100, 0, 100, 0, 0, 0, null, false, 0, 0);
-                
-             
-
-            }
-        };
-
-        JButton sendAbort = new JButton(sendAbortAction);
-
-        add(sendAbort);
+        setSize(300, 300);
+        this.setLayout(new MigLayout("ins 0"));
+       
+       
+        //código adaptado do PLanControlStatePanel.java
+        
+        setSize(300, 300);
+        this.setLayout(new MigLayout("ins 0"));
+        stateValueLabel = new JLabel();
+        stateValueLabel.setText("");
+        stateLabel = new JLabel();
+        stateLabel.setText("<html><b>" + I18n.text("Camera") + ": ");
         
         
-        //ComboBox para Camara
+        
+     
+        
+
+        this.add(stateLabel, "");
+        
+        //ComboBox para Camera
         String[] Cam = new String[] {"Camera 1", "Camera 2"};
         JComboBox<String> CamList = new JComboBox<>(Cam);
         add(CamList);
         selectedCam = (String) CamList.getSelectedItem();
+        
+        this.add(stateValueLabel, "wrap");
+        
+        ActionListener cbActionListener = new ActionListener() {//add actionlistner to listen for change
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            
+                selectedCam = (String) CamList.getSelectedItem();
+                System.out.println("camera selecionada: "+ selectedCam);
+                int a = 1;
+               
+            }
+            
+        };
+        
+        CamList.addActionListener(cbActionListener);
+             
+                
+            
+            
+       
+        
+        planIdValueLabel = new JLabel();
+        planIdValueLabel.setText("");
+        planIdLabel = new JLabel();
+        planIdLabel.setText("<html><b>" + I18n.text("Resolução") + ": ");
+
+        this.add(planIdLabel);
         
         //ComboBox para Resolução 
         
@@ -117,16 +176,65 @@ public class AutoPlanner extends ConsolePanel {
         add(ResList);
         selectedRes = (String) ResList.getSelectedItem();
         
-        //ComboBox para resolução
+        
+        this.add(planIdValueLabel, "wrap");
+
+        nodeIdValueLabel = new JLabel();
+        nodeIdValueLabel.setText("");
+        nodeIdLabel = new JLabel();
+        nodeIdLabel.setText("<html><b>" + I18n.text("Veiculo") + ": ");
+        
+        this.add(nodeIdLabel);
+
+        //ComboBox para veículo 
         
         String[] Veiculo = new String[] {"X8 SkyWalker", "Mariner"};
         
         JComboBox<String> VeicList = new JComboBox<>(Veiculo);
         add(VeicList);
         selectedVeic = (String) VeicList.getSelectedItem();
+              
+        this.add(nodeIdValueLabel, "wrap");
         
+        AltIdValueLabel = new JLabel();
+        AltIdValueLabel.setText("");
+        AltIdLabel = new JLabel();
+        AltIdLabel.setText("<html><b>" + I18n.text("Altitude") + ": ");
         
+        this.add(AltIdLabel);
+
+        //spinbox para altitude
         
+        SpinnerModel model =
+                new SpinnerNumberModel(50,    //initial value
+                                       0,    //min
+                                       150, //max
+                                       1); //step
+        
+        JSpinner spinner = new JSpinner(model);
+        add(spinner);
+              
+        this.add(AltIdValueLabel, "wrap");
+        
+        AngIdValueLabel = new JLabel();
+        AngIdValueLabel.setText("");
+        AngIdLabel = new JLabel();
+        AngIdLabel.setText("<html><b>" + I18n.text("Angulo") + ": ");
+        
+        this.add(AngIdLabel);
+
+        //spinbox para altitude
+        
+        SpinnerModel modelA=
+                new SpinnerNumberModel(90,    //initial value
+                                       0,    //min
+                                       180, //max
+                                       1); //step
+        
+        JSpinner spinnerA = new JSpinner(modelA);
+        add(spinnerA);
+              
+        this.add(AngIdValueLabel, "wrap");
         
         
         
@@ -134,7 +242,7 @@ public class AutoPlanner extends ConsolePanel {
         
         
     }
-
+        
     @Override
     public void cleanSubPanel() {
 
