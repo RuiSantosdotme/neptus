@@ -31,7 +31,7 @@
  */
 package pt.lsts.neptus.autoplanner;
 
-import pt.lsts.neptus.types.coord.UTMCoordinates;
+import pt.lsts.neptus.types.coord.LocationType;
 
 /**
  * @author grifo
@@ -39,20 +39,20 @@ import pt.lsts.neptus.types.coord.UTMCoordinates;
  */
 public class WaypointPolygon {
 
-    public UTMCoordinates point;
+    public LocationType point;
     public boolean used;
     public int idOrientacao;
     
     /**
      * 
      */
-    public WaypointPolygon(UTMCoordinates point, int idOrientacao) {
+    public WaypointPolygon(LocationType point, int idOrientacao) {
         this.point = point;
         used = false;
         this.idOrientacao = idOrientacao;
     }
     
-    public WaypointPolygon(UTMCoordinates point, int idOrientacao, boolean used) {
+    public WaypointPolygon(LocationType point, int idOrientacao, boolean used) {
         this.point = point;
         used = false;
         this.idOrientacao = idOrientacao;
@@ -69,5 +69,5 @@ public class WaypointPolygon {
     public void resetUsed() {
         used = false;
     }
-
+    
 }

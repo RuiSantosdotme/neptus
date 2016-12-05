@@ -31,7 +31,7 @@
  */
 package pt.lsts.neptus.autoplanner;
 
-import pt.lsts.neptus.types.coord.UTMCoordinates;
+import pt.lsts.neptus.types.coord.LocationType;
 
 /**
  * @author grifo
@@ -40,9 +40,9 @@ import pt.lsts.neptus.types.coord.UTMCoordinates;
 public class LineLLUTM {
     
     // start of line
-    private UTMCoordinates p1;
+    private LocationType p1;
     // end of line
-    private UTMCoordinates p2;
+    private LocationType p2;
     
     /**
      * 
@@ -55,15 +55,15 @@ public class LineLLUTM {
     /**
      * 
      */
-    public LineLLUTM(UTMCoordinates p1, UTMCoordinates p2) {
+    public LineLLUTM(LocationType p1, LocationType p2) {
         this.p1 = p1;
         this.p2 = p2;
     }
     
-    public UTMCoordinates getP1() {
+    public LocationType getP1() {
         return p1;
     }
-    public UTMCoordinates getP2() {
+    public LocationType getP2() {
         return p2;
     }
 
