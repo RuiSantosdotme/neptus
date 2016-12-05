@@ -47,7 +47,8 @@ public class RealWorldPolygon {
     private List<UTMCoordinates> polygonUTM = null;
     final static float rad2deg = (float)(180 / Math.PI);
     final static float deg2rad = (float)(1.0 / rad2deg);
-    private List<UTMCoordinates> waypoints = null;
+    private List<WaypointPolygon> waypoints = null;
+    private List<LocationType> orderedWaypoints = null;
     
     /**
      * 
@@ -55,7 +56,8 @@ public class RealWorldPolygon {
     public RealWorldPolygon() {
         polygonLL = new ArrayList<LocationType>();
         polygonUTM = new ArrayList<UTMCoordinates>();
-        waypoints = new ArrayList<UTMCoordinates>();
+        waypoints = new ArrayList<WaypointPolygon>();
+        orderedWaypoints = new ArrayList<LocationType>();
     }
     
     public enum StartPosition {
@@ -67,7 +69,6 @@ public class RealWorldPolygon {
     
     
     public void insertPoint(LocationType point) {
-        
         polygonLL.add(point);
         UTMCoordinates pointUTM = new UTMCoordinates(point.getLatitudeDegs(),point.getLongitudeDegs());
         polygonUTM.add(pointUTM);
@@ -83,44 +84,44 @@ public class RealWorldPolygon {
         
     }
     
-    Rect getPolyMinMax(List<UTMCoordinates> poly)
+    Rect getPolyMinMax(List<LocationType> poly)
     {
         if (poly.size() == 0)
             return new Rect();
 
         double minx, miny, maxx, maxy;
 
-        minx = maxx = poly.get(0).getLongitudeDegrees();
-        miny = maxy = poly.get(0).getLatitudeDegrees();
+        minx = maxx = poly.get(0).getLongitudeDegs();
+        miny = maxy = poly.get(0).getLatitudeDegs();
         
-        for (UTMCoordinates pnt : poly) {
+        for (LocationType pnt : poly) {
             //Console.WriteLine(pnt.ToString());
-            minx = Math.min(minx, pnt.getLongitudeDegrees());
-            maxx = Math.max(maxx, pnt.getLongitudeDegrees());
+            minx = Math.min(minx, pnt.getLongitudeDegs());
+            maxx = Math.max(maxx, pnt.getLongitudeDegs());
 
-            miny = Math.min(miny, pnt.getLatitudeDegrees());
-            maxy = Math.max(maxy, pnt.getLatitudeDegrees());
+            miny = Math.min(miny, pnt.getLatitudeDegs());
+            maxy = Math.max(maxy, pnt.getLatitudeDegs());
         }
 
         return new Rect(minx, maxy, maxx, miny);
     }
     
     // polar x to rectangular
-    static double newposx(double x, double bearing, double distance)
-    {
-        double degN = 90 - bearing;
-        if (degN < 0)
-            degN += 360;
-        return (x + distance * Math.cos(degN * deg2rad));
-    }
-    // polar y to rectangular
-    static double newposy(double y, double bearing, double distance)
-    {
-        double degN = 90 - bearing;
-        if (degN < 0)
-            degN += 360;
-        return (y + distance * Math.sin(degN * deg2rad));
-    }
+//    static double newposx(double x, double bearing, double distance)
+//    {
+//        double degN = 90 - bearing;
+//        if (degN < 0)
+//            degN += 360;
+//        return (x + distance * Math.cos(degN * deg2rad));
+//    }
+//    // polar y to rectangular
+//    static double newposy(double y, double bearing, double distance)
+//    {
+//        double degN = 90 - bearing;
+//        if (degN < 0)
+//            degN += 360;
+//        return (y + distance * Math.sin(degN * deg2rad));
+//    }
     
     double offsetMtoLL(double dn) {
 
@@ -137,21 +138,21 @@ public class RealWorldPolygon {
         
     }
     
-    public UTMCoordinates getIntersection(LineLLUTM l1, LineLLUTM l2) {
+    public LocationType getIntersection(LineLLUTM l1, LineLLUTM l2) {
         
         double px, py;
         
-        double x1 = l1.getP1().getLongitudeDegrees();
-        double y1 = l1.getP1().getLatitudeDegrees();
+        double x1 = l1.getP1().getLongitudeDegs();
+        double y1 = l1.getP1().getLatitudeDegs();
         
-        double x2 = l1.getP2().getLongitudeDegrees();
-        double y2 = l1.getP2().getLatitudeDegrees();
+        double x2 = l1.getP2().getLongitudeDegs();
+        double y2 = l1.getP2().getLatitudeDegs();
         
-        double x3 = l2.getP1().getLongitudeDegrees();
-        double y3 = l2.getP1().getLatitudeDegrees();
+        double x3 = l2.getP1().getLongitudeDegs();
+        double y3 = l2.getP1().getLatitudeDegs();
         
-        double x4 = l2.getP2().getLongitudeDegrees();
-        double y4 = l2.getP2().getLatitudeDegrees();
+        double x4 = l2.getP2().getLongitudeDegs();
+        double y4 = l2.getP2().getLatitudeDegs();
         
         if(((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4)) == 0) {
             return null;
@@ -160,12 +161,80 @@ public class RealWorldPolygon {
             px = ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
             py = ((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
             
-            return new UTMCoordinates(py, px);
+            return new LocationType(py, px);
         }
         
     }
     
-    public List<UTMCoordinates> CreateGrid(double altitude, double distance, double spacing, double angle, double overshoot1,double overshoot2, StartPosition startpos, boolean shutter, float minLaneSeparation, float leadin)
+    private int getIdClosestPoint(LocationType point, List<WaypointPolygon> pointList) {
+        
+        int id=0;
+        double aux = 0;
+        double min=point.getDistanceInMeters(pointList.get(0).point);
+        
+        for(int i = 0; i < pointList.size(); i++) {
+            aux = Math.min(min, point.getDistanceInMeters(pointList.get(i).point));
+            if (min!=aux) {
+                id=i;
+                min=aux;
+            }
+        }
+        
+        return id;
+    }
+    
+    private boolean alreadyExists(LocationType point, List<WaypointPolygon> pointList) {
+        
+        for (WaypointPolygon pnt : pointList) {
+            if((pnt.point.getLongitudeDegs() == point.getLongitudeDegs()) && (pnt.point.getLatitudeDegs() == point.getLatitudeDegs()))
+                return true;
+        }
+        
+        return false;       
+    }
+    
+    private List<WaypointPolygon> getSameOrientationPoints(int or_id, List<WaypointPolygon> pointList) {
+        
+        for (int i = 0; i < pointList.size(); i++ ) {
+            if(pointList.get(i).idOrientacao != or_id) {
+                pointList.remove(i);
+                i--;
+            }
+        }
+        
+        
+        return pointList;
+    }
+    
+    private List<WaypointPolygon> cleanDuplicatedValues(List<WaypointPolygon> list) {
+        
+        for (int i = 0; i < list.size(); i++ ) {
+            
+            for (int j = i+1; j < list.size(); j++) {
+            
+                if(list.get(i).point == list.get(j).point) {
+                    list.remove(i);
+                    i--;
+                    break;
+                }
+            }
+        }
+        
+        
+        return list;
+    }
+    
+    private int numNotUsed(List<WaypointPolygon> list) {
+        int notUsed = 0;
+        for (WaypointPolygon pnt : list) {
+            if(!pnt.used)
+                notUsed++;
+        }
+        
+        return notUsed;
+    }
+    
+    public List<LocationType> CreateGrid(double altitude, double distance, double spacing, double angle, double overshoot1,double overshoot2, StartPosition startpos, boolean shutter, float minLaneSeparation, float leadin)
     {
         //DoDebug();
 
@@ -175,20 +244,20 @@ public class RealWorldPolygon {
         if (distance < 0.1)
             distance = 0.1;
 
-        if (polygonUTM.size() == 0)
-            return new ArrayList<UTMCoordinates>();
+        if (polygonLL.size() == 0)
+            return new ArrayList<LocationType>();
 
         
         // Make a non round number in case of corner cases
-        if (minLaneSeparation != 0)
-            minLaneSeparation += 0.5F;
-        // Lane Separation in meters
-        double minLaneSeparationINMeters = minLaneSeparation * distance;
+//        if (minLaneSeparation != 0)
+//            minLaneSeparation += 0.5F;
+//        // Lane Separation in meters
+//        double minLaneSeparationINMeters = minLaneSeparation * distance;
 
-        List<UTMCoordinates> ans = new ArrayList<UTMCoordinates>();
+        //List<UTMCoordinates> ans = new ArrayList<UTMCoordinates>();
 
         // utm zone distance calcs will be done in
-        int utmzone = polygonUTM.get(0).getZoneNumber();
+        //int utmzone = polygonLL.get(0).getZoneNumber();
         
 
         // utm position list
@@ -199,7 +268,7 @@ public class RealWorldPolygon {
 //            utmpositions.Add(utmpositions[0]); // make a full loop
 //
         // get mins/maxs of coverage area ESTÁ ERRADO, O RECTANGULO NÃO TEM OS VARIOS PONTOS LÁ DENTRO
-        Rect area = getPolyMinMax(polygonUTM);
+        Rect area = getPolyMinMax(polygonLL);
 
         // get initial grid
 
@@ -215,29 +284,29 @@ public class RealWorldPolygon {
         
         for (double auxrising = area.Bottom; auxrising <= area.Top; auxrising += auxspacing) {
             
-            LineLLUTM line = new LineLLUTM(new UTMCoordinates(auxrising, area.Right), new UTMCoordinates(auxrising, area.Left));
+            LineLLUTM line = new LineLLUTM(new LocationType(auxrising, area.Right), new LocationType(auxrising, area.Left));
             grid.add(line);
             lines++;
             
         }
         
         LineLLUTM linePolygon = null;
-        UTMCoordinates inter = null;
+        LocationType inter = null;
         
-        for (int i = 0; i < polygonUTM.size(); i++) {
+        for (int i = 0; i < polygonLL.size(); i++) {
             
-            if(i == polygonUTM.size()-1)
-                linePolygon = new LineLLUTM(polygonUTM.get(i), polygonUTM.get(0));
+            if(i == polygonLL.size()-1)
+                linePolygon = new LineLLUTM(polygonLL.get(i), polygonLL.get(0));
             else
-                linePolygon = new LineLLUTM(polygonUTM.get(i), polygonUTM.get(i+1));
+                linePolygon = new LineLLUTM(polygonLL.get(i), polygonLL.get(i+1));
             
             
             for(int j = 0; j < grid.size(); j++) {
                 
                 inter = getIntersection(linePolygon, grid.get(j));
                 
-                if((inter.getLatitudeDegrees() > area.Bottom) && (inter.getLatitudeDegrees() < area.Top) && (inter.getLongitudeDegrees() < area.Right) && (inter.getLongitudeDegrees() > area.Left)) {
-                    waypoints.add(inter);
+                if((inter.getLatitudeDegs() > area.Bottom) && (inter.getLatitudeDegs() < area.Top) && (inter.getLongitudeDegs() < area.Right) && (inter.getLongitudeDegs() > area.Left)) {
+                    waypoints.add(new WaypointPolygon(inter, j));
                 }
                 
             }
@@ -245,8 +314,62 @@ public class RealWorldPolygon {
             
         }
         
+        //waypoints = cleanDuplicatedValues(waypoints);
+        List<WaypointPolygon> waypointsAuxList = null;
+        WaypointPolygon last = null;
+        
+        int state = 0;
+        
+        while(numNotUsed(waypoints) > 0) {
+            
+            if(state == 0) {
+                double aux = 0;
+                double min = waypoints.get(0).point.getLatitudeDegs();
+                int index = -1;
+                for (int i = 0; i < waypoints.size(); i++) {
+                    aux = Math.min(min, waypoints.get(i).point.getLatitudeDegs());
+                    if (min!=aux) {
+                        index=i;
+                        min=aux;
+                    }
+                }
+                waypoints.get(index).used=true;
+                last = waypoints.get(index); //vai buscar ponto de baixo                
+                orderedWaypoints.add(last.point);
+                state = 1;
+            } else if (state == 1) {
+                waypointsAuxList = new ArrayList<WaypointPolygon>();
+                int index = -1;
+                for (int i = 0; i < waypoints.size(); i++) {
+                    if(!waypoints.get(i).used) {
+                        waypointsAuxList.add(waypoints.get(i));
+                    }
+                }
+                
+                index = getIdClosestPoint(last.point, waypointsAuxList);         
+                
+                waypoints.get(index).used=true;
+                last = waypoints.get(index); //vai buscar ponto de baixo                
+                orderedWaypoints.add(last.point);
+                state = 2;
+            } else if (state == 2) {
+                waypointsAuxList = new ArrayList<WaypointPolygon>();
+                waypointsAuxList = getSameOrientationPoints(last.idOrientacao, waypoints);
+                int id = getIdClosestPoint(last.point, waypointsAuxList);
+                
+                int index = waypoints.indexOf(waypointsAuxList.get(id));
+                waypoints.get(index).used=true;
+                last = waypoints.get(index); //vai buscar ponto de baixo                
+                orderedWaypoints.add(last.point);
+                state = 1;
+            }
+            
+            
+            
+        }
+           
 
-        return null;
+        return orderedWaypoints;
     }
 
 

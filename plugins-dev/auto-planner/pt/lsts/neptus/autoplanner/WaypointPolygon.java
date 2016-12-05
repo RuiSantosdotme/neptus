@@ -27,7 +27,7 @@
  * For more information please see <http://lsts.fe.up.pt/neptus>.
  *
  * Author: grifo
- * 01/12/2016
+ * 03/12/2016
  */
 package pt.lsts.neptus.autoplanner;
 
@@ -37,34 +37,37 @@ import pt.lsts.neptus.types.coord.LocationType;
  * @author grifo
  *
  */
-public class LineLLUTM {
-    
-    // start of line
-    private LocationType p1;
-    // end of line
-    private LocationType p2;
-    
-    /**
-     * 
-     */
-    public LineLLUTM() {
-        this.p1 = null;
-        this.p2 = null;
-    }
-    
-    /**
-     * 
-     */
-    public LineLLUTM(LocationType p1, LocationType p2) {
-        this.p1 = p1;
-        this.p2 = p2;
-    }
-    
-    public LocationType getP1() {
-        return p1;
-    }
-    public LocationType getP2() {
-        return p2;
-    }
+public class WaypointPolygon {
 
+    public LocationType point;
+    public boolean used;
+    public int idOrientacao;
+    
+    /**
+     * 
+     */
+    public WaypointPolygon(LocationType point, int idOrientacao) {
+        this.point = point;
+        used = false;
+        this.idOrientacao = idOrientacao;
+    }
+    
+    public WaypointPolygon(LocationType point, int idOrientacao, boolean used) {
+        this.point = point;
+        used = false;
+        this.idOrientacao = idOrientacao;
+        this.used = used;
+    }
+    
+    public boolean isUsed() {
+        return used;
+    }
+    
+    public void setUsed() {
+        used = true;
+    }
+    public void resetUsed() {
+        used = false;
+    }
+    
 }
