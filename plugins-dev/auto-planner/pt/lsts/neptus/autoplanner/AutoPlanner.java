@@ -4,6 +4,8 @@ import java.awt.Component;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -55,7 +57,7 @@ import pt.lsts.neptus.plugins.map.interactions.*;
  *
  */
 @PluginDescription(name = "Auto Planner")
-@Popup(accelerator='Y',pos = POSITION.RIGHT, height=200, width = 200)
+//@Popup(accelerator='Y',pos = POSITION.RIGHT, height=200, width = 200)
 @SuppressWarnings("serial")
 
 public class AutoPlanner extends ConsolePanel {
@@ -63,6 +65,12 @@ public class AutoPlanner extends ConsolePanel {
     /**
      * @param console
      */
+    
+    //Variaveis globais para aceder à opçao escolhida
+    public static String selectedCam, selectedVeic, selectedRes ;
+    
+    
+    
     public AutoPlanner(ConsoleLayout console) {
         super(console);
     }
@@ -84,14 +92,47 @@ public class AutoPlanner extends ConsolePanel {
                 System.out.println("LONGITUDE = "+ MapEditor.longi);
                 
                 PolygonInteraction.realCoordPolygon.CreateGrid(100, 0, 100, 0, 0, 0, null, false, 0, 0);
+                
+             
 
-               
             }
         };
 
         JButton sendAbort = new JButton(sendAbortAction);
 
         add(sendAbort);
+        
+        
+        //ComboBox para Camara
+        String[] Cam = new String[] {"Camera 1", "Camera 2"};
+        JComboBox<String> CamList = new JComboBox<>(Cam);
+        add(CamList);
+        selectedCam = (String) CamList.getSelectedItem();
+        
+        //ComboBox para Resolução 
+        
+        String[] Res = new String[] {"800 x 600", "1024 x 768", "1280 x 720", "1366 x 768"};
+        
+        JComboBox<String> ResList = new JComboBox<>(Res);
+        add(ResList);
+        selectedRes = (String) ResList.getSelectedItem();
+        
+        //ComboBox para resolução
+        
+        String[] Veiculo = new String[] {"X8 SkyWalker", "Mariner"};
+        
+        JComboBox<String> VeicList = new JComboBox<>(Veiculo);
+        add(VeicList);
+        selectedVeic = (String) VeicList.getSelectedItem();
+        
+        
+        
+        
+        
+        
+        
+        
+        
     }
 
     @Override
