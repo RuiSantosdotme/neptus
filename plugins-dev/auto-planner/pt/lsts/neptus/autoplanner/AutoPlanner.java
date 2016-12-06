@@ -30,6 +30,8 @@ import javax.swing.JTextArea;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.text.BadLocationException;
 
 import com.google.common.eventbus.Subscribe;
@@ -135,7 +137,7 @@ public class AutoPlanner extends ConsolePanel {
         this.add(stateLabel, "");
         
         //ComboBox para Camera
-        String[] Cam = new String[] {"Camera 1", "Camera 2"};
+        String[] Cam = new String[] {"Go Pro", "Sony"};
         JComboBox<String> CamList = new JComboBox<>(Cam);
         add(CamList);
         selectedCam = (String) CamList.getSelectedItem();
@@ -178,6 +180,20 @@ public class AutoPlanner extends ConsolePanel {
         
         
         this.add(planIdValueLabel, "wrap");
+        
+        ActionListener resActionListener = new ActionListener() {//add actionlistner to listen for change
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            
+                selectedRes = (String) ResList.getSelectedItem();
+                System.out.println("Res selecionada: "+ selectedRes);
+               
+               
+            }
+            
+        };
+        
+        ResList.addActionListener(resActionListener);
 
         nodeIdValueLabel = new JLabel();
         nodeIdValueLabel.setText("");
@@ -195,6 +211,22 @@ public class AutoPlanner extends ConsolePanel {
         selectedVeic = (String) VeicList.getSelectedItem();
               
         this.add(nodeIdValueLabel, "wrap");
+        
+
+        
+        ActionListener VeicActionListener = new ActionListener() {//add actionlistner to listen for change
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            
+                selectedVeic = (String) VeicList.getSelectedItem();
+                System.out.println("Veiculo selecionado: "+ selectedVeic);
+               
+               
+            }
+            
+        };
+        
+        VeicList.addActionListener(VeicActionListener);
         
         AltIdValueLabel = new JLabel();
         AltIdValueLabel.setText("");
@@ -216,6 +248,28 @@ public class AutoPlanner extends ConsolePanel {
               
         this.add(AltIdValueLabel, "wrap");
         
+        spinner.addChangeListener(new ChangeListener() {      
+            @Override
+            public void stateChanged(ChangeEvent e) {
+              // handle click
+                
+                try {
+                    spinner.commitEdit();
+                } catch ( java.text.ParseException d ) {  }
+                
+             
+                highInt = (Integer) spinner.getValue();
+                
+                System.out.println("ALtitude: "+ highInt);
+                
+                
+            }
+
+            
+          });
+       
+     
+        
         AngIdValueLabel = new JLabel();
         AngIdValueLabel.setText("");
         AngIdLabel = new JLabel();
@@ -223,7 +277,7 @@ public class AutoPlanner extends ConsolePanel {
         
         this.add(AngIdLabel);
 
-        //spinbox para altitude
+        //spinbox para angulo
         
         SpinnerModel modelA=
                 new SpinnerNumberModel(90,    //initial value
@@ -235,6 +289,25 @@ public class AutoPlanner extends ConsolePanel {
         add(spinnerA);
               
         this.add(AngIdValueLabel, "wrap");
+        
+        
+        spinnerA.addChangeListener(new ChangeListener() {      
+            @Override
+            public void stateChanged(ChangeEvent e) {
+              // handle click
+                
+                try {
+                    spinnerA.commitEdit();
+                } catch ( java.text.ParseException d ) {  }
+                
+             
+                angleInt = (Integer) spinnerA.getValue();
+                
+                System.out.println("Angulo: "+ angleInt);
+               
+            }
+          });
+      
         
         
         
