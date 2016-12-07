@@ -305,7 +305,7 @@ public class RealWorldPolygon {
         
         PlanType plan = pc.getPlan();
         plan.setId("CoveragePlan");
-        plan.setVehicle("isurus");
+        plan.setVehicle("x8-02");
         console.getConsole().getMission().addPlan(plan);
         console.getConsole().warnMissionListeners();
         console.getConsole().setPlan(plan);
