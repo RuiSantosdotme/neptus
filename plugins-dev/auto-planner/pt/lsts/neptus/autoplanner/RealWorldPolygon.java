@@ -188,7 +188,7 @@ public class RealWorldPolygon {
         return id;
     }
     
-    private int getIdClosestPoint(WaypointPolygon point, List<Integer> oriPoints) {
+    private int getIdClosestPoint(WaypointPolygon last, List<Integer> oriPoints) {
         
         int id=0;
         double aux = 0;
@@ -200,10 +200,10 @@ public class RealWorldPolygon {
             
             aux2=waypoints.get(oriPoints.get(i));
             
-            if(point != aux2) {
-                aux = Math.min(min, point.point.getDistanceInMeters(aux2.point));
+            if(last != aux2) {
+                aux = Math.min(min, last.point.getDistanceInMeters(aux2.point));
                 if (min!=aux) {
-                    id=i;
+                    id=oriPoints.get(i);
                     min=aux;
                 }
             }
@@ -292,15 +292,15 @@ public class RealWorldPolygon {
 //        pc.setLocation(new LocationType(41.8561, -6.7062));
 //        pc.addGoto(new LinkedHashMap<>());
         
-        for (WaypointPolygon pnt : waypoints) {
-            pc.setLocation(pnt.point);
-            pc.addGoto(new LinkedHashMap<>());
-        }
-        
-//        for (LocationType pnt : orderedWaypoints) {
-//            pc.setLocation(pnt);
+//        for (WaypointPolygon pnt : waypoints) {
+//            pc.setLocation(pnt.point);
 //            pc.addGoto(new LinkedHashMap<>());
 //        }
+        
+        for (LocationType pnt : orderedWaypoints) {
+            pc.setLocation(pnt);
+            pc.addGoto(new LinkedHashMap<>());
+        }
 
         
         PlanType plan = pc.getPlan();
@@ -402,55 +402,55 @@ public class RealWorldPolygon {
         
         
         
-        createCoverage(console);
+//        createCoverage(console);
         
         
         
         //waypoints = cleanDuplicatedValues(waypoints);
-//        WaypointPolygon last = null;
-//        
-//        int state = 0;
-//        
-//        while(numNotUsed(waypoints) > 0) {
-//            
-//            if(state == 0) {
-//                double aux = 0;
-//                double min = waypoints.get(0).point.getLatitudeDegs();
-//                int index = -1;
-//                for (int i = 0; i < waypoints.size(); i++) {
-//                    aux = Math.min(min, waypoints.get(i).point.getLatitudeDegs());
-//                    if (min!=aux) {
-//                        index=i;
-//                        min=aux;
-//                    }
-//                }
-//                waypoints.get(index).used=true;
-//                last = waypoints.get(index); //vai buscar ponto de baixo                
-//                orderedWaypoints.add(last.point);
-//                state = 2;
-//            } else if (state == 1) {                
-//                int index = getIdClosestPointNotUsed(last.point);         
-//                
-//                waypoints.get(index).used=true;
-//                last = waypoints.get(index); //vai buscar ponto de baixo                
-//                orderedWaypoints.add(last.point);
-//                state = 2;
-//            } else if (state == 2) {
-//                List<Integer> oriPoints = getSameOrientationPoints(last, waypoints);
-//                
-//                int id = getIdClosestPoint(last, oriPoints);
-//                
-//                waypoints.get(id).used=true;
-//                last = waypoints.get(id); //vai buscar ponto de baixo                
-//                orderedWaypoints.add(last.point);
-//                state = 1;
-//            }
-//            
-//            
-//            
-//        }
-//        
-//        createCoverage(console);
+        WaypointPolygon last = null;
+        
+        int state = 0;
+        
+        while(numNotUsed(waypoints) > 0) {
+            
+            if(state == 0) {
+                double aux = 0;
+                double min = waypoints.get(0).point.getLatitudeDegs();
+                int index = -1;
+                for (int i = 0; i < waypoints.size(); i++) {
+                    aux = Math.min(min, waypoints.get(i).point.getLatitudeDegs());
+                    if (min!=aux) {
+                        index=i;
+                        min=aux;
+                    }
+                }
+                waypoints.get(index).used=true;
+                last = waypoints.get(index); //vai buscar ponto de baixo                
+                orderedWaypoints.add(last.point);
+                state = 2;
+            } else if (state == 1) {                
+                int index = getIdClosestPointNotUsed(last.point);         
+                
+                waypoints.get(index).used=true;
+                last = waypoints.get(index); //vai buscar ponto de baixo                
+                orderedWaypoints.add(last.point);
+                state = 2;
+            } else if (state == 2) {
+                List<Integer> oriPoints = getSameOrientationPoints(last, waypoints);
+                
+                int id = getIdClosestPoint(last, oriPoints);
+                
+                waypoints.get(id).used=true;
+                last = waypoints.get(id); //vai buscar ponto de baixo                
+                orderedWaypoints.add(last.point);
+                state = 1;
+            }
+            
+            
+            
+        }
+        
+        createCoverage(console);
            
 
         return orderedWaypoints;
