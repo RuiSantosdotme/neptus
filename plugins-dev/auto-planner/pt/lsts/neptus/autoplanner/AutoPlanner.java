@@ -147,7 +147,6 @@ public class AutoPlanner extends ConsolePanel {
         ActionListener cbActionListener = new ActionListener() {//add actionlistner to listen for change
             @Override
             public void actionPerformed(ActionEvent e) {
-<<<<<<< HEAD
 
                 Abort abortMsg = new Abort();
                 send(abortMsg);                
@@ -160,13 +159,11 @@ public class AutoPlanner extends ConsolePanel {
                 
              
 
-=======
             
                 selectedCam = (String) CamList.getSelectedItem();
                 System.out.println("camera selecionada: "+ selectedCam);
                 int a = 1;
-               
->>>>>>> origin/develop
+
             }
             
         };
