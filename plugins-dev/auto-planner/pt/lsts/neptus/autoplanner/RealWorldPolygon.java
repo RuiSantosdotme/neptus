@@ -31,8 +31,11 @@
  */
 package pt.lsts.neptus.autoplanner;
 
+import pt.lsts.neptus.console.ConsoleLayout;
+import pt.lsts.neptus.mp.templates.PlanCreator;
 import pt.lsts.neptus.types.coord.LocationType;
 import pt.lsts.neptus.types.coord.UTMCoordinates;
+import pt.lsts.neptus.types.mission.plan.PlanType;
 
 import java.util.*;
 
@@ -166,17 +169,43 @@ public class RealWorldPolygon {
         
     }
     
-    private int getIdClosestPoint(LocationType point, List<WaypointPolygon> pointList) {
+    private int getIdClosestPointNotUsed(LocationType point) {
         
         int id=0;
         double aux = 0;
-        double min=point.getDistanceInMeters(pointList.get(0).point);
+        double min=point.getDistanceInMeters(waypoints.get(0).point);
         
-        for(int i = 0; i < pointList.size(); i++) {
-            aux = Math.min(min, point.getDistanceInMeters(pointList.get(i).point));
-            if (min!=aux) {
-                id=i;
-                min=aux;
+        for(int i = 0; i < waypoints.size(); i++) {
+            if(!waypoints.get(i).used) {
+                aux = Math.min(min, point.getDistanceInMeters(waypoints.get(i).point));
+                if (min!=aux) {
+                    id=i;
+                    min=aux;
+                }
+            }
+        }
+        
+        return id;
+    }
+    
+    private int getIdClosestPoint(WaypointPolygon point, List<Integer> oriPoints) {
+        
+        int id=0;
+        double aux = 0;
+        double min=999999999;
+        
+        WaypointPolygon aux2;
+        
+        for(int i = 0; i < oriPoints.size(); i++) {
+            
+            aux2=waypoints.get(oriPoints.get(i));
+            
+            if(point != aux2) {
+                aux = Math.min(min, point.point.getDistanceInMeters(aux2.point));
+                if (min!=aux) {
+                    id=i;
+                    min=aux;
+                }
             }
         }
         
@@ -193,17 +222,19 @@ public class RealWorldPolygon {
         return false;       
     }
     
-    private List<WaypointPolygon> getSameOrientationPoints(int or_id, List<WaypointPolygon> pointList) {
+    private List<Integer> getSameOrientationPoints(WaypointPolygon last, List<WaypointPolygon> pointList) {
         
+        List<Integer> oriPoints = new ArrayList<Integer>();
         for (int i = 0; i < pointList.size(); i++ ) {
-            if(pointList.get(i).idOrientacao != or_id) {
-                pointList.remove(i);
-                i--;
+            if(pointList.get(i).idOrientacao == last.idOrientacao) {
+                if(pointList.get(i) != last) {
+                    oriPoints.add(i);
+                }
             }
         }
         
         
-        return pointList;
+        return oriPoints;
     }
     
     private List<WaypointPolygon> cleanDuplicatedValues(List<WaypointPolygon> list) {
@@ -234,7 +265,55 @@ public class RealWorldPolygon {
         return notUsed;
     }
     
-    public List<LocationType> CreateGrid(double altitude, double distance, double spacing, double angle, double overshoot1,double overshoot2, StartPosition startpos, boolean shutter, float minLaneSeparation, float leadin)
+    public void createCoverage(ConsoleLayout console) {
+        
+        PlanCreator pc = new PlanCreator(console.getConsole().getMission());
+        
+        pc.setZ(40, pt.lsts.neptus.mp.ManeuverLocation.Z_UNITS.HEIGHT);
+        
+        pc.setLocation(console.getConsole().getMission().getHomeRef());
+        
+        
+        //pc.move(100, 50);
+//        pc.setLocation(new LocationType(41.8567, -6.7062));
+//        pc.addGoto(new LinkedHashMap<>());
+//        pc.setLocation(new LocationType(41.8567, -6.7046));
+//        pc.addGoto(new LinkedHashMap<>());
+//        pc.setLocation(new LocationType(41.8565, -6.7046));
+//        pc.addGoto(new LinkedHashMap<>());
+//        pc.setLocation(new LocationType(41.8565, -6.7062));
+//        pc.addGoto(new LinkedHashMap<>());
+//        pc.setLocation(new LocationType(41.8563, -6.7062));
+//        pc.addGoto(new LinkedHashMap<>());
+//        pc.setLocation(new LocationType(41.8563, -6.7046));
+//        pc.addGoto(new LinkedHashMap<>());
+//        pc.setLocation(new LocationType(41.8561, -6.7046));
+//        pc.addGoto(new LinkedHashMap<>());
+//        pc.setLocation(new LocationType(41.8561, -6.7062));
+//        pc.addGoto(new LinkedHashMap<>());
+        
+        for (WaypointPolygon pnt : waypoints) {
+            pc.setLocation(pnt.point);
+            pc.addGoto(new LinkedHashMap<>());
+        }
+        
+//        for (LocationType pnt : orderedWaypoints) {
+//            pc.setLocation(pnt);
+//            pc.addGoto(new LinkedHashMap<>());
+//        }
+
+        
+        PlanType plan = pc.getPlan();
+        plan.setId("CoveragePlan");
+        plan.setVehicle("isurus");
+        console.getConsole().getMission().addPlan(plan);
+        console.getConsole().warnMissionListeners();
+        console.getConsole().setPlan(plan);
+        console.getConsole().getMission().save(false);
+    }
+
+    
+    public List<LocationType> CreateGrid(double altitude, double distance, double spacing, double angle, double overshoot1,double overshoot2, StartPosition startpos, boolean shutter, float minLaneSeparation, float leadin, ConsoleLayout console)
     {
         //DoDebug();
 
@@ -273,7 +352,7 @@ public class RealWorldPolygon {
         // get initial grid
 
         // used to determine the size of the outer grid area
-        double diagdist = area.getDiagDistance();
+        //double diagdist = area.getDiagDistance();
 
         // somewhere to store out generated lines
         List<LineLLUTM> grid = new ArrayList<LineLLUTM>();
@@ -305,7 +384,13 @@ public class RealWorldPolygon {
                 
                 inter = getIntersection(linePolygon, grid.get(j));
                 
-                if((inter.getLatitudeDegs() > area.Bottom) && (inter.getLatitudeDegs() < area.Top) && (inter.getLongitudeDegs() < area.Right) && (inter.getLongitudeDegs() > area.Left)) {
+//                if((inter.getLatitudeDegs() > area.Bottom) && (inter.getLatitudeDegs() < area.Top) && (inter.getLongitudeDegs() < area.Right) && (inter.getLongitudeDegs() > area.Left)) {
+//                    waypoints.add(new WaypointPolygon(inter, j));
+//                }
+                if((inter.getLatitudeDegs() > Math.min(linePolygon.getP1().getLatitudeDegs(), linePolygon.getP2().getLatitudeDegs())) && 
+                        (inter.getLatitudeDegs() < Math.max(linePolygon.getP1().getLatitudeDegs(), linePolygon.getP2().getLatitudeDegs())) && 
+                        (inter.getLongitudeDegs() > Math.min(linePolygon.getP1().getLongitudeDegs(), linePolygon.getP2().getLongitudeDegs()))
+                        && (inter.getLongitudeDegs() < Math.max(linePolygon.getP1().getLongitudeDegs(), linePolygon.getP2().getLongitudeDegs()))) {
                     waypoints.add(new WaypointPolygon(inter, j));
                 }
                 
@@ -314,59 +399,58 @@ public class RealWorldPolygon {
             
         }
         
+        
+        
+        
+        createCoverage(console);
+        
+        
+        
         //waypoints = cleanDuplicatedValues(waypoints);
-        List<WaypointPolygon> waypointsAuxList = null;
-        WaypointPolygon last = null;
+//        WaypointPolygon last = null;
+//        
+//        int state = 1;
+//        
+//        while(numNotUsed(waypoints) > 0) {
+//            
+//            if(state == 0) {
+//                double aux = 0;
+//                double min = waypoints.get(0).point.getLatitudeDegs();
+//                int index = -1;
+//                for (int i = 0; i < waypoints.size(); i++) {
+//                    aux = Math.min(min, waypoints.get(i).point.getLatitudeDegs());
+//                    if (min!=aux) {
+//                        index=i;
+//                        min=aux;
+//                    }
+//                }
+//                waypoints.get(index).used=true;
+//                last = waypoints.get(index); //vai buscar ponto de baixo                
+//                orderedWaypoints.add(last.point);
+//                state = 1;
+//            } else if (state == 1) {                
+//                int index = getIdClosestPointNotUsed(last.point);         
+//                
+//                waypoints.get(index).used=true;
+//                last = waypoints.get(index); //vai buscar ponto de baixo                
+//                orderedWaypoints.add(last.point);
+//                state = 2;
+//            } else if (state == 2) {
+//                List<Integer> oriPoints = getSameOrientationPoints(last, waypoints);
+//                
+//                int id = getIdClosestPoint(last, oriPoints);
+//                
+//                waypoints.get(id).used=true;
+//                last = waypoints.get(id); //vai buscar ponto de baixo                
+//                orderedWaypoints.add(last.point);
+//                state = 1;
+//            }
+//            
+//            
+//            
+//        }
         
-        int state = 0;
-        
-        while(numNotUsed(waypoints) > 0) {
-            
-            if(state == 0) {
-                double aux = 0;
-                double min = waypoints.get(0).point.getLatitudeDegs();
-                int index = -1;
-                for (int i = 0; i < waypoints.size(); i++) {
-                    aux = Math.min(min, waypoints.get(i).point.getLatitudeDegs());
-                    if (min!=aux) {
-                        index=i;
-                        min=aux;
-                    }
-                }
-                waypoints.get(index).used=true;
-                last = waypoints.get(index); //vai buscar ponto de baixo                
-                orderedWaypoints.add(last.point);
-                state = 1;
-            } else if (state == 1) {
-                waypointsAuxList = new ArrayList<WaypointPolygon>();
-                int index = -1;
-                for (int i = 0; i < waypoints.size(); i++) {
-                    if(!waypoints.get(i).used) {
-                        waypointsAuxList.add(waypoints.get(i));
-                    }
-                }
-                
-                index = getIdClosestPoint(last.point, waypointsAuxList);         
-                
-                waypoints.get(index).used=true;
-                last = waypoints.get(index); //vai buscar ponto de baixo                
-                orderedWaypoints.add(last.point);
-                state = 2;
-            } else if (state == 2) {
-                waypointsAuxList = new ArrayList<WaypointPolygon>();
-                waypointsAuxList = getSameOrientationPoints(last.idOrientacao, waypoints);
-                int id = getIdClosestPoint(last.point, waypointsAuxList);
-                
-                int index = waypoints.indexOf(waypointsAuxList.get(id));
-                waypoints.get(index).used=true;
-                last = waypoints.get(index); //vai buscar ponto de baixo                
-                orderedWaypoints.add(last.point);
-                state = 1;
-            }
-            
-            
-            
-        }
+        //createCoverage(console);
            
 
         return orderedWaypoints;
