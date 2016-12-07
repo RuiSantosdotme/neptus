@@ -113,7 +113,7 @@ public class AutoPlanner extends ConsolePanel {
     public AutoPlanner(ConsoleLayout console) {
         super(console);
     }
-
+    
     @Override
     public void initSubPanel() {
         setSize(300, 300);
@@ -144,6 +144,25 @@ public class AutoPlanner extends ConsolePanel {
         
         this.add(stateValueLabel, "wrap");
         
+        
+        Action sendAbortAction = new AbstractAction(I18n.text("Send Abort")) {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                
+                
+                PolygonInteraction.realCoordPolygon.CreateGrid(100, 0, 150, 0, 0, 0, null, false, 0, 0, getConsole());
+                
+             
+
+            }
+        };
+        
+        JButton sendAbort = new JButton(sendAbortAction);
+        add(sendAbort);
+        
+        
         ActionListener cbActionListener = new ActionListener() {//add actionlistner to listen for change
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -154,8 +173,6 @@ public class AutoPlanner extends ConsolePanel {
                 System.out.println("LATITUDE = "+ MapEditor.lat);
                 System.out.println("------------------------------------------------------");
                 System.out.println("LONGITUDE = "+ MapEditor.longi);
-                
-                PolygonInteraction.realCoordPolygon.CreateGrid(100, 0, 150, 0, 0, 0, null, false, 0, 0, getConsole());
                 
              
 
@@ -327,7 +344,8 @@ public class AutoPlanner extends ConsolePanel {
         
         
     }
-        
+    
+    
     @Override
     public void cleanSubPanel() {
 

@@ -409,7 +409,7 @@ public class RealWorldPolygon {
         //waypoints = cleanDuplicatedValues(waypoints);
 //        WaypointPolygon last = null;
 //        
-//        int state = 1;
+//        int state = 0;
 //        
 //        while(numNotUsed(waypoints) > 0) {
 //            
@@ -427,7 +427,7 @@ public class RealWorldPolygon {
 //                waypoints.get(index).used=true;
 //                last = waypoints.get(index); //vai buscar ponto de baixo                
 //                orderedWaypoints.add(last.point);
-//                state = 1;
+//                state = 2;
 //            } else if (state == 1) {                
 //                int index = getIdClosestPointNotUsed(last.point);         
 //                
@@ -449,8 +449,8 @@ public class RealWorldPolygon {
 //            
 //            
 //        }
-        
-        //createCoverage(console);
+//        
+//        createCoverage(console);
            
 
         return orderedWaypoints;
