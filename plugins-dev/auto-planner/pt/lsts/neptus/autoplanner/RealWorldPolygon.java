@@ -173,7 +173,7 @@ public class RealWorldPolygon {
         
         int id=0;
         double aux = 0;
-        double min=point.getDistanceInMeters(waypoints.get(0).point);
+        double min=Double.MAX_VALUE;
         
         for(int i = 0; i < waypoints.size(); i++) {
             if(!waypoints.get(i).used) {
@@ -192,7 +192,7 @@ public class RealWorldPolygon {
         
         int id=0;
         double aux = 0;
-        double min=999999999;
+        double min=Double.MAX_VALUE;
         
         WaypointPolygon aux2;
         
@@ -212,15 +212,15 @@ public class RealWorldPolygon {
         return id;
     }
     
-    private boolean alreadyExists(LocationType point, List<WaypointPolygon> pointList) {
-        
-        for (WaypointPolygon pnt : pointList) {
-            if((pnt.point.getLongitudeDegs() == point.getLongitudeDegs()) && (pnt.point.getLatitudeDegs() == point.getLatitudeDegs()))
-                return true;
-        }
-        
-        return false;       
-    }
+//    private boolean alreadyExists(LocationType point, List<WaypointPolygon> pointList) {
+//        
+//        for (WaypointPolygon pnt : pointList) {
+//            if((pnt.point.getLongitudeDegs() == point.getLongitudeDegs()) && (pnt.point.getLatitudeDegs() == point.getLatitudeDegs()))
+//                return true;
+//        }
+//        
+//        return false;       
+//    }
     
     private List<Integer> getSameOrientationPoints(WaypointPolygon last, List<WaypointPolygon> pointList) {
         
@@ -359,9 +359,10 @@ public class RealWorldPolygon {
         // number of lines we need
         int lines = 0;
         
+        double axuspacing2 = spacing/Math.cos(angle); //para quando for para ter angulo
         double auxspacing = offsetMtoLL(spacing);
         
-        for (double auxrising = area.Bottom; auxrising <= area.Top; auxrising += auxspacing) {
+        for (double auxrising = area.Bottom + auxspacing/2; auxrising <= area.Top; auxrising += auxspacing) {
             
             LineLLUTM line = new LineLLUTM(new LocationType(auxrising, area.Right), new LocationType(auxrising, area.Left));
             grid.add(line);
@@ -403,7 +404,7 @@ public class RealWorldPolygon {
         
         
 //        createCoverage(console);
-        
+        int debug=0;
         
         
         //waypoints = cleanDuplicatedValues(waypoints);
@@ -414,6 +415,7 @@ public class RealWorldPolygon {
         while(numNotUsed(waypoints) > 0) {
             
             if(state == 0) {
+                debug++;
                 double aux = 0;
                 double min = waypoints.get(0).point.getLatitudeDegs();
                 int index = -1;
@@ -428,17 +430,19 @@ public class RealWorldPolygon {
                 last = waypoints.get(index); //vai buscar ponto de baixo                
                 orderedWaypoints.add(last.point);
                 state = 2;
-            } else if (state == 1) {                
+            } else if (state == 1) { //Vai buscar o mais proximo sem ser usado               
+                debug++;
                 int index = getIdClosestPointNotUsed(last.point);         
                 
                 waypoints.get(index).used=true;
                 last = waypoints.get(index); //vai buscar ponto de baixo                
                 orderedWaypoints.add(last.point);
                 state = 2;
-            } else if (state == 2) {
+            } else if (state == 2) { //Vai buscar o mais proximo na mesma linha de orientação
+                debug++;
                 List<Integer> oriPoints = getSameOrientationPoints(last, waypoints);
                 
-                int id = getIdClosestPoint(last, oriPoints);
+                int id = getIdClosestPoint(last, oriPoints); // Falta adicionar verificação a ver se não está usado
                 
                 waypoints.get(id).used=true;
                 last = waypoints.get(id); //vai buscar ponto de baixo                
