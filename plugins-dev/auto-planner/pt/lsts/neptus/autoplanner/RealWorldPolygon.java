@@ -222,17 +222,62 @@ public class RealWorldPolygon {
 //        return false;       
 //    }
     
-    private List<Integer> getSameOrientationPoints(WaypointPolygon last, List<WaypointPolygon> pointList) {
+    boolean contains(List<LocationType> polyg, LocationType test)
+    {
+        double testx = test.getLongitudeDegs();
+        double testy = test.getLatitudeDegs();
+        int nvert = polyg.size();
+        int i, j;
+        boolean c = false;
+        for (i = 0, j = nvert-1; i < nvert; j = i++) {
+            if ( ((polyg.get(i).getLatitudeDegs()>testy) != (polyg.get(j).getLatitudeDegs()>testy)) &&
+                    (testx < (polyg.get(j).getLongitudeDegs()-polyg.get(i).getLongitudeDegs()) * (testy-polyg.get(i).getLatitudeDegs()) / (polyg.get(j).getLatitudeDegs()-polyg.get(i).getLatitudeDegs()) + polyg.get(i).getLongitudeDegs()) )
+                    c = !c;
+            }
+        return c;
+    }
+    
+    private LocationType getPointInBetween(WaypointPolygon last, WaypointPolygon next) {
+        double x, y;
+        
+        x = (last.point.getLongitudeDegs() + next.point.getLongitudeDegs())/2;
+        
+        y = (last.point.getLatitudeDegs() + next.point.getLatitudeDegs())/2;
+        
+        return new LocationType(y,x);
+    }
+
+    
+    private List<Integer> getSameOrientationPointInside(WaypointPolygon last, List<WaypointPolygon> pointList) {
         
         List<Integer> oriPoints = new ArrayList<Integer>();
+            
         for (int i = 0; i < pointList.size(); i++ ) {
-            if(pointList.get(i).idOrientacao == last.idOrientacao) {
-                if(pointList.get(i) != last) {
-                    oriPoints.add(i);
+            
+            if((pointList.get(i).idOrientacao == last.idOrientacao) && (pointList.get(i) != last) && (contains(polygonLL,getPointInBetween(last, pointList.get(i))))) {
+                LineLLUTM linePolygon, line = null;
+                LocationType inter = null;
+                for (int j = 0; j < polygonLL.size();j++) {
+                    
+                    if(j == polygonLL.size()-1)
+                        linePolygon = new LineLLUTM(polygonLL.get(j), polygonLL.get(0));
+                    else
+                        linePolygon = new LineLLUTM(polygonLL.get(j), polygonLL.get(j+1));
+                    
+                    line = new LineLLUTM(last.point, pointList.get(i).point);
+                    inter = getIntersection(linePolygon, line);
+                    
+                    if(!((inter.getLatitudeDegs() > Math.min(linePolygon.getP1().getLatitudeDegs(), linePolygon.getP2().getLatitudeDegs())) && 
+                            (inter.getLatitudeDegs() < Math.max(linePolygon.getP1().getLatitudeDegs(), linePolygon.getP2().getLatitudeDegs())) && 
+                            (inter.getLongitudeDegs() > Math.min(linePolygon.getP1().getLongitudeDegs(), linePolygon.getP2().getLongitudeDegs()))
+                            && (inter.getLongitudeDegs() < Math.max(linePolygon.getP1().getLongitudeDegs(), linePolygon.getP2().getLongitudeDegs())))) {
+                        oriPoints.add(i);
+                        break;
+                    }
                 }
+                
             }
-        }
-        
+        }        
         
         return oriPoints;
     }
@@ -435,20 +480,22 @@ public class RealWorldPolygon {
                 int index = getIdClosestPointNotUsed(last.point);         
                 
                 waypoints.get(index).used=true;
-                last = waypoints.get(index); //vai buscar ponto de baixo                
+                last = waypoints.get(index);          
                 orderedWaypoints.add(last.point);
                 state = 2;
             } else if (state == 2) { //Vai buscar o mais proximo na mesma linha de orientação
                 debug++;
-                List<Integer> oriPoints = getSameOrientationPoints(last, waypoints);
+                List<Integer> oriPoints = getSameOrientationPointInside(last, waypoints);
                 
                 int id = getIdClosestPoint(last, oriPoints); // Falta adicionar verificação a ver se não está usado
                 
                 waypoints.get(id).used=true;
-                last = waypoints.get(id); //vai buscar ponto de baixo                
+                last = waypoints.get(id);
                 orderedWaypoints.add(last.point);
                 state = 1;
             }
+            
+            // https://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html#The Method
             
             
             
