@@ -152,7 +152,7 @@ public class AutoPlanner extends ConsolePanel {
 
                 
                 
-                PolygonInteraction.realCoordPolygon.CreateGrid(100, 0, 150, 0, 0, 0, null, false, 0, 0, getConsole());
+                PolygonInteraction.realCoordPolygon.CreateGrid(100, 0, 150, Math.PI, 0, 0, null, false, 0, 0, getConsole());
                 
              
 
