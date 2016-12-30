@@ -221,7 +221,7 @@ public class AutoPlanner extends ConsolePanel {
                
                 
                 
-             spinnerG.setVisible(false);
+             /*spinnerG.setVisible(false);
              CamList.setVisible(false);
              VeicList.setVisible(false);
                 
@@ -258,7 +258,7 @@ public class AutoPlanner extends ConsolePanel {
              FlightModeB.setVisible(false);
              createPlan.setVisible(false);
              EditPlan.setVisible(false);
-             DelPlan.setVisible(false);
+             DelPlan.setVisible(false);*/
              
              /*Depois de tudo apagado, criam-se os botões que irão estar visiveis durante o modo de voo*/
              
