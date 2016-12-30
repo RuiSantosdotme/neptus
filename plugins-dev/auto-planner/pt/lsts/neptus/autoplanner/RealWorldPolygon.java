@@ -173,7 +173,7 @@ public class RealWorldPolygon {
         
         int id=0;
         double aux = 0;
-        double min=point.getDistanceInMeters(waypoints.get(0).point);
+        double min=Double.MAX_VALUE;
         
         for(int i = 0; i < waypoints.size(); i++) {
             if(!waypoints.get(i).used) {
@@ -192,7 +192,7 @@ public class RealWorldPolygon {
         
         int id=0;
         double aux = 0;
-        double min=999999999;
+        double min=Double.MAX_VALUE;
         
         WaypointPolygon aux2;
         
@@ -212,27 +212,157 @@ public class RealWorldPolygon {
         return id;
     }
     
-    private boolean alreadyExists(LocationType point, List<WaypointPolygon> pointList) {
-        
-        for (WaypointPolygon pnt : pointList) {
-            if((pnt.point.getLongitudeDegs() == point.getLongitudeDegs()) && (pnt.point.getLatitudeDegs() == point.getLatitudeDegs()))
-                return true;
-        }
-        
-        return false;       
+//    private boolean alreadyExists(LocationType point, List<WaypointPolygon> pointList) {
+//        
+//        for (WaypointPolygon pnt : pointList) {
+//            if((pnt.point.getLongitudeDegs() == point.getLongitudeDegs()) && (pnt.point.getLatitudeDegs() == point.getLatitudeDegs()))
+//                return true;
+//        }
+//        
+//        return false;       
+//    }
+    
+    boolean contains(List<LocationType> polyg, LocationType test)
+    {
+        double testx = test.getLongitudeDegs();
+        double testy = test.getLatitudeDegs();
+        int nvert = polyg.size();
+        int i, j;
+        boolean c = false;
+        for (i = 0, j = nvert-1; i < nvert; j = i++) {
+            if ( ((polyg.get(i).getLatitudeDegs()>testy) != (polyg.get(j).getLatitudeDegs()>testy)) &&
+                    (testx < (polyg.get(j).getLongitudeDegs()-polyg.get(i).getLongitudeDegs()) * (testy-polyg.get(i).getLatitudeDegs()) / (polyg.get(j).getLatitudeDegs()-polyg.get(i).getLatitudeDegs()) + polyg.get(i).getLongitudeDegs()) )
+                    c = !c;
+            }
+        return c;
     }
     
-    private List<Integer> getSameOrientationPoints(WaypointPolygon last, List<WaypointPolygon> pointList) {
+    private LocationType getPointInBetween(WaypointPolygon last, WaypointPolygon next) {
+        double x, y;
+        
+        x = (last.point.getLongitudeDegs() + next.point.getLongitudeDegs())/2;
+        
+        y = (last.point.getLatitudeDegs() + next.point.getLatitudeDegs())/2;
+        
+        return new LocationType(y,x);
+    }
+
+    
+    private List<Integer> getSameOrientationPointInside(WaypointPolygon last, List<WaypointPolygon> pointList) {
         
         List<Integer> oriPoints = new ArrayList<Integer>();
+            
         for (int i = 0; i < pointList.size(); i++ ) {
-            if(pointList.get(i).idOrientacao == last.idOrientacao) {
-                if(pointList.get(i) != last) {
-                    oriPoints.add(i);
+            
+            if((pointList.get(i).idOrientacao == last.idOrientacao) && (pointList.get(i) != last) && (contains(polygonLL,getPointInBetween(last, pointList.get(i))))) {
+                LineLLUTM linePolygon, line = null;
+                LocationType inter = null;
+                line = new LineLLUTM(last.point, pointList.get(i).point);
+                int numInterDentro = 0;
+                for (int j = 0; j < polygonLL.size();j++) {
+                    
+                    if(j == polygonLL.size()-1)
+                        linePolygon = new LineLLUTM(polygonLL.get(j), polygonLL.get(0));
+                    else
+                        linePolygon = new LineLLUTM(polygonLL.get(j), polygonLL.get(j+1));
+                    
+                    inter = getIntersection(linePolygon, line);
+                    
+                    boolean bool1 = ((inter.getLatitudeDegs() > Math.min(linePolygon.getP1().getLatitudeDegs(), linePolygon.getP2().getLatitudeDegs())) && 
+                          (inter.getLatitudeDegs() < Math.max(linePolygon.getP1().getLatitudeDegs(), linePolygon.getP2().getLatitudeDegs())) && 
+                          (inter.getLongitudeDegs() > Math.min(linePolygon.getP1().getLongitudeDegs(), linePolygon.getP2().getLongitudeDegs())) &&
+                          (inter.getLongitudeDegs() < Math.max(linePolygon.getP1().getLongitudeDegs(), linePolygon.getP2().getLongitudeDegs())));
+                    boolean bool2 = ((inter.getLatitudeDegs() + offsetMtoLL(1) > Math.min(line.getP1().getLatitudeDegs(), line.getP2().getLatitudeDegs())) && 
+                          (inter.getLatitudeDegs() - offsetMtoLL(1) < Math.max(line.getP1().getLatitudeDegs(), line.getP2().getLatitudeDegs())) && 
+                          (inter.getLongitudeDegs() + offsetMtoLL(1) > Math.min(line.getP1().getLongitudeDegs(), line.getP2().getLongitudeDegs())) &&
+                          (inter.getLongitudeDegs() - offsetMtoLL(1) < Math.max(line.getP1().getLongitudeDegs(), line.getP2().getLongitudeDegs())) &&
+                          (inter.getDistanceInMeters(line.getP1()) > 1) &&
+                          (inter.getDistanceInMeters(line.getP2()) > 1)
+                          );
+                    
+                    if (bool1 && bool2) {
+                        numInterDentro++;
+                        break;
+                    }
+                    
+//                   double dist1 = inter.getDistanceInMeters(line.getP1());
+//                   double dist2 = inter.getDistanceInMeters(line.getP2());
+//                   boolean bool1 = ((inter.getLatitudeDegs() > Math.min(linePolygon.getP1().getLatitudeDegs(), linePolygon.getP2().getLatitudeDegs())) && 
+//                           (inter.getLatitudeDegs() < Math.max(linePolygon.getP1().getLatitudeDegs(), linePolygon.getP2().getLatitudeDegs())) && 
+//                           (inter.getLongitudeDegs() > Math.min(linePolygon.getP1().getLongitudeDegs(), linePolygon.getP2().getLongitudeDegs())) &&
+//                           (inter.getLongitudeDegs() < Math.max(linePolygon.getP1().getLongitudeDegs(), linePolygon.getP2().getLongitudeDegs())));
+//                   boolean bool2 = ((inter.getLatitudeDegs() + offsetMtoLL(1) > Math.min(line.getP1().getLatitudeDegs(), line.getP2().getLatitudeDegs())) && 
+//                           (inter.getLatitudeDegs() - offsetMtoLL(1) < Math.max(line.getP1().getLatitudeDegs(), line.getP2().getLatitudeDegs())) && 
+//                           (inter.getLongitudeDegs() + offsetMtoLL(1) > Math.min(line.getP1().getLongitudeDegs(), line.getP2().getLongitudeDegs())) &&
+//                           (inter.getLongitudeDegs() - offsetMtoLL(1) < Math.max(line.getP1().getLongitudeDegs(), line.getP2().getLongitudeDegs())) &&
+//                           (line.getP1().getLongitudeDegs() != line.getP2().getLongitudeDegs()) &&
+//                           (line.getP1().getLatitudeDegs() != line.getP2().getLatitudeDegs())
+//                           );
+//                   boolean bool3 = ((inter.getLatitudeDegs() + offsetMtoLL(1) > Math.min(line.getP1().getLatitudeDegs(), line.getP2().getLatitudeDegs())) && 
+//                           (inter.getLatitudeDegs() - offsetMtoLL(1) < Math.max(line.getP1().getLatitudeDegs(), line.getP2().getLatitudeDegs())) &&
+//                           (line.getP1().getLongitudeDegs() == line.getP2().getLongitudeDegs()) &&
+//                           (Math.abs(inter.getLongitudeDegs() - line.getP2().getLongitudeDegs()) <= offsetMtoLL(1)) &&
+//                           (inter.getDistanceInMeters(line.getP1()) > 1) &&
+//                           (inter.getDistanceInMeters(line.getP2()) > 1)
+//                           );
+//                   boolean b1, b2, b3, b4, b5;
+//                           b1 = (inter.getLongitudeDegs() + offsetMtoLL(1) > Math.min(line.getP1().getLongitudeDegs(), line.getP2().getLongitudeDegs()));
+//                           b2 = (inter.getLongitudeDegs() - offsetMtoLL(1) < Math.max(line.getP1().getLongitudeDegs(), line.getP2().getLongitudeDegs()));
+//                           b3 = (Math.abs(inter.getLatitudeDegs() - line.getP2().getLatitudeDegs()) <= offsetMtoLL(1));
+//                           b4 = (inter.getDistanceInMeters(line.getP1()) > 1);
+//                           b5 = (inter.getDistanceInMeters(line.getP2()) > 1);
+//                   boolean bool4 = ((inter.getLongitudeDegs() + offsetMtoLL(1) > Math.min(line.getP1().getLongitudeDegs(), line.getP2().getLongitudeDegs())) && 
+//                           (inter.getLongitudeDegs() - offsetMtoLL(1) < Math.max(line.getP1().getLongitudeDegs(), line.getP2().getLongitudeDegs())) &&
+//                           (line.getP1().getLatitudeDegs() == line.getP2().getLatitudeDegs()) &&
+//                           (Math.abs(inter.getLatitudeDegs() - line.getP2().getLatitudeDegs()) <= offsetMtoLL(1)) &&
+//                           (inter.getDistanceInMeters(line.getP1()) > 1) &&
+//                           (inter.getDistanceInMeters(line.getP2()) > 1)
+//                           );
+//                    
+//                    if(((inter.getLatitudeDegs() > Math.min(linePolygon.getP1().getLatitudeDegs(), linePolygon.getP2().getLatitudeDegs())) && 
+//                        (inter.getLatitudeDegs() < Math.max(linePolygon.getP1().getLatitudeDegs(), linePolygon.getP2().getLatitudeDegs())) && 
+//                        (inter.getLongitudeDegs() > Math.min(linePolygon.getP1().getLongitudeDegs(), linePolygon.getP2().getLongitudeDegs())) &&
+//                        (inter.getLongitudeDegs() < Math.max(linePolygon.getP1().getLongitudeDegs(), linePolygon.getP2().getLongitudeDegs())))
+//                        && (
+//                                ((inter.getLatitudeDegs() + offsetMtoLL(1) > Math.min(line.getP1().getLatitudeDegs(), line.getP2().getLatitudeDegs())) && 
+//                                (inter.getLatitudeDegs() - offsetMtoLL(1) < Math.max(line.getP1().getLatitudeDegs(), line.getP2().getLatitudeDegs())) && 
+//                                (inter.getLongitudeDegs() + offsetMtoLL(1) > Math.min(line.getP1().getLongitudeDegs(), line.getP2().getLongitudeDegs())) &&
+//                                (inter.getLongitudeDegs() - offsetMtoLL(1) < Math.max(line.getP1().getLongitudeDegs(), line.getP2().getLongitudeDegs())) &&
+//                                (Math.abs(line.getP1().getLongitudeDegs() - line.getP2().getLongitudeDegs()) >= offsetMtoLL(1)) &&
+//                                (Math.abs(line.getP1().getLatitudeDegs() - line.getP2().getLatitudeDegs()) >= offsetMtoLL(1))
+//                                )
+//                                ||
+//                                ((inter.getLatitudeDegs() + offsetMtoLL(1) > Math.min(line.getP1().getLatitudeDegs(), line.getP2().getLatitudeDegs())) && 
+//                                (inter.getLatitudeDegs() - offsetMtoLL(1) < Math.max(line.getP1().getLatitudeDegs(), line.getP2().getLatitudeDegs())) &&
+//                                (line.getP1().getLongitudeDegs() == line.getP2().getLongitudeDegs()) &&
+//                                (Math.abs(inter.getLongitudeDegs() - line.getP2().getLongitudeDegs()) <= offsetMtoLL(1)) &&
+//                                (inter.getDistanceInMeters(line.getP1()) > 1) &&
+//                                (inter.getDistanceInMeters(line.getP2()) > 1)
+//                                )
+//                                ||
+//                                ((inter.getLongitudeDegs() + offsetMtoLL(1) > Math.min(line.getP1().getLongitudeDegs(), line.getP2().getLongitudeDegs())) && 
+//                                (inter.getLongitudeDegs() - offsetMtoLL(1) < Math.max(line.getP1().getLongitudeDegs(), line.getP2().getLongitudeDegs())) &&
+//                                (line.getP1().getLatitudeDegs() == line.getP2().getLatitudeDegs()) &&
+//                                (Math.abs(inter.getLatitudeDegs() - line.getP2().getLatitudeDegs()) <= offsetMtoLL(1)) &&
+//                                (inter.getDistanceInMeters(line.getP1()) > 1) &&
+//                                (inter.getDistanceInMeters(line.getP2()) > 1)
+//                                )
+//                                
+//                        )
+//                         
+//                        ) {
+//                         numInterDentro++;
+//                         break;
+//                        }
+                    
                 }
+                if(numInterDentro == 0) {
+                    oriPoints.add(i);
+                    break;
+                }
+                
             }
-        }
-        
+        }        
         
         return oriPoints;
     }
@@ -314,7 +444,7 @@ public class RealWorldPolygon {
 
     
     public List<LocationType> CreateGrid(double altitude, double distance, double spacing, double angle, double overshoot1,double overshoot2, StartPosition startpos, boolean shutter, float minLaneSeparation, float leadin, ConsoleLayout console)
-    {
+    {   //spacing em metros
         //DoDebug();
 
         if (spacing < 4 && spacing != 0)
@@ -325,6 +455,12 @@ public class RealWorldPolygon {
 
         if (polygonLL.size() == 0)
             return new ArrayList<LocationType>();
+        
+        while(angle > (Math.PI/2))
+            angle=angle-Math.PI;
+        
+        while(angle <= -(Math.PI/2))
+            angle=angle+Math.PI;
 
         
         // Make a non round number in case of corner cases
@@ -359,16 +495,51 @@ public class RealWorldPolygon {
         // number of lines we need
         int lines = 0;
         
-        double auxspacing = offsetMtoLL(spacing);
         
-        for (double auxrising = area.Bottom; auxrising <= area.Top; auxrising += auxspacing) {
+        
+        
+        if (angle == 0) {
+            double auxspacing = offsetMtoLL(spacing);
+            for (double auxrising = area.Bottom + auxspacing/2; auxrising <= area.Top; auxrising += auxspacing) {
+                
+                LineLLUTM line = new LineLLUTM(new LocationType(auxrising, area.Right), new LocationType(auxrising, area.Left));
+                grid.add(line);
+                lines++;
+                
+            }
+        
+        } else if (angle > 0) {
+            double auxspacing = offsetMtoLL(spacing)/Math.cos(angle);
+            for (double auxdropleft = area.Top - auxspacing/2, auxdropright = ((area.Top - auxspacing/2) + Math.tan(angle)*area.getWidth()) ; auxdropright >= area.Bottom; auxdropright -= auxspacing, auxdropleft -= auxspacing) {
+                
+                LineLLUTM line = new LineLLUTM(new LocationType(auxdropleft, area.Left), new LocationType(auxdropright, area.Right));
+                grid.add(line);
+                lines++;
+                
+            }
             
-            LineLLUTM line = new LineLLUTM(new LocationType(auxrising, area.Right), new LocationType(auxrising, area.Left));
-            grid.add(line);
-            lines++;
+        } else if (angle < 0) {
+            double auxspacing = offsetMtoLL(spacing)/Math.cos(angle*-1);
+            for (double auxdropright = area.Top - auxspacing/2, auxdropleft = ((area.Top - auxspacing/2) + Math.tan(angle*-1)*area.getWidth()) ; auxdropleft >= area.Bottom; auxdropright -= auxspacing, auxdropleft -= auxspacing) {
+                
+                LineLLUTM line = new LineLLUTM(new LocationType(auxdropleft, area.Left), new LocationType(auxdropright, area.Right));
+                grid.add(line);
+                lines++;
+                
+            }
+            
+        } else if (angle == (Math.PI/2)) {
+            double auxspacing = offsetMtoLL(spacing);
+            for (double auxrising = area.Left + auxspacing/2; auxrising <= area.Right; auxrising += auxspacing) {
+                
+                LineLLUTM line = new LineLLUTM(new LocationType(area.Bottom, auxrising), new LocationType(area.Top, auxrising));
+                grid.add(line);
+                lines++;
+                
+            }
             
         }
-        
+            
         LineLLUTM linePolygon = null;
         LocationType inter = null;
         
@@ -384,9 +555,6 @@ public class RealWorldPolygon {
                 
                 inter = getIntersection(linePolygon, grid.get(j));
                 
-//                if((inter.getLatitudeDegs() > area.Bottom) && (inter.getLatitudeDegs() < area.Top) && (inter.getLongitudeDegs() < area.Right) && (inter.getLongitudeDegs() > area.Left)) {
-//                    waypoints.add(new WaypointPolygon(inter, j));
-//                }
                 if((inter.getLatitudeDegs() > Math.min(linePolygon.getP1().getLatitudeDegs(), linePolygon.getP2().getLatitudeDegs())) && 
                         (inter.getLatitudeDegs() < Math.max(linePolygon.getP1().getLatitudeDegs(), linePolygon.getP2().getLatitudeDegs())) && 
                         (inter.getLongitudeDegs() > Math.min(linePolygon.getP1().getLongitudeDegs(), linePolygon.getP2().getLongitudeDegs()))
@@ -403,7 +571,7 @@ public class RealWorldPolygon {
         
         
 //        createCoverage(console);
-        
+        int debug=0;
         
         
         //waypoints = cleanDuplicatedValues(waypoints);
@@ -414,6 +582,7 @@ public class RealWorldPolygon {
         while(numNotUsed(waypoints) > 0) {
             
             if(state == 0) {
+                debug++;
                 double aux = 0;
                 double min = waypoints.get(0).point.getLatitudeDegs();
                 int index = -1;
@@ -428,23 +597,27 @@ public class RealWorldPolygon {
                 last = waypoints.get(index); //vai buscar ponto de baixo                
                 orderedWaypoints.add(last.point);
                 state = 2;
-            } else if (state == 1) {                
+            } else if (state == 1) { //Vai buscar o mais proximo sem ser usado               
+                debug++;
                 int index = getIdClosestPointNotUsed(last.point);         
                 
                 waypoints.get(index).used=true;
-                last = waypoints.get(index); //vai buscar ponto de baixo                
+                last = waypoints.get(index);          
                 orderedWaypoints.add(last.point);
                 state = 2;
-            } else if (state == 2) {
-                List<Integer> oriPoints = getSameOrientationPoints(last, waypoints);
+            } else if (state == 2) { //Vai buscar o mais proximo na mesma linha de orientação
+                debug++;
+                List<Integer> oriPoints = getSameOrientationPointInside(last, waypoints);
                 
-                int id = getIdClosestPoint(last, oriPoints);
+                int id = getIdClosestPoint(last, oriPoints); // Falta adicionar verificação a ver se não está usado
                 
                 waypoints.get(id).used=true;
-                last = waypoints.get(id); //vai buscar ponto de baixo                
+                last = waypoints.get(id);
                 orderedWaypoints.add(last.point);
                 state = 1;
             }
+            
+            // https://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html#The Method
             
             
             

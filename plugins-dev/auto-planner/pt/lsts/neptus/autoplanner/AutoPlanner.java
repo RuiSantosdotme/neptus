@@ -165,18 +165,7 @@ public class AutoPlanner extends ConsolePanel {
         this.setLayout(new MigLayout("ins 0"));
    
         
-        //  é só descomentar para o caso de querer meter algum texto atras do botao 
-       /*   
-        bValueLabel = new JLabel();
-        bValueLabel.setText("");
-        bLabel = new JLabel();
-        bLabel.setText("<html><b>" + I18n.text(" ")); 
-        
-        this.add(bLabel, "");
-        */
-        
-        
-        //Botao aqui
+  
         
            
 
@@ -191,18 +180,6 @@ public class AutoPlanner extends ConsolePanel {
                 PolygonInteraction.realCoordPolygon.CreateGrid(100, 0, 150, 0, 0, 0, null, false, 0, 0, getConsole());
                 System.out.println("TESTE DO BOTAO");
                 
-                //REmover os botoes
-              /*  CamList.setVisible(false);
-                spinnerR.setVisible(false);
-                VeicList.setVisible(false);
-                spinner.setVisible(false);
-                spinnerA.setVisible(false);
-                
-                stateLabel.setText("");
-                planIdLabel.setText("");
-                nodeIdLabel.setText("");
-                FocIdLabel.setText("");
-                AngIdLabel.setText("");*/
                 
                           
             /*  String profileName = "Flight Mode";
@@ -213,65 +190,6 @@ public class AutoPlanner extends ConsolePanel {
              
               f.setActiveProfile("Flight Mode");*/
                 
-                
-                
-                /*Apagar tudo o que diz respeito ao modo Pilot-plane */
-                
-
-               
-                
-                
-             /*spinnerG.setVisible(false);
-             CamList.setVisible(false);
-             VeicList.setVisible(false);
-                
-             stateLabel.setVisible(false);
-             stateValueLabel.setVisible(false);
-             nodeIdLabel.setVisible(false);
-             FocIdLabel.setVisible(false);               
-             widthIdValueLabel.setVisible(false);
-             widthIdLabel.setVisible(false);
-             heigthIdValueLabel.setVisible(false);
-             heigthIdLabel.setVisible(false);
-             ResIdValueLabel.setVisible(false);
-             ResIdLabel.setVisible(false);
-             GIdValueLabel.setVisible(false);;
-             AltIdValueLabel.setVisible(false);
-             AltIdLabel.setVisible(false);
-             stateValueLabel.setVisible(false);
-             nodeIdValueLabel.setVisible(false);
-             FocIdValueLabel.setVisible(false);
-             GIdValueLabel.setVisible(false);
-             GIdLabel.setVisible(false);
-             entValueLabel.setVisible(false);
-             entLabel.setVisible(false);
-             
-             CamList.setVisible(false);
-             ResList.setVisible(false);       
-             VeicList.setVisible(false);  
-             
-             focText.setVisible(false);
-             heigthSen.setVisible(false);
-             widthSen.setVisible(false);
-             AltSen.setVisible(false);
-             
-             FlightModeB.setVisible(false);
-             createPlan.setVisible(false);
-             EditPlan.setVisible(false);
-             DelPlan.setVisible(false);*/
-             
-             /*Depois de tudo apagado, criam-se os botões que irão estar visiveis durante o modo de voo*/
-             
-             
-          
-             
-             
-             
-             
-             
-             
-             
-           
              
              
              
@@ -660,75 +578,5 @@ public class AutoPlanner extends ConsolePanel {
     }
 
 
-
-
-private void createActions(String availableSelected) {
-    
-    // Add button action
-    FlightModeB.setAction(new AbstractAction(I18n.text("Add")) {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (availableSelected == null)
-                return;
-            Class<?> clazz = plugins.get(availableSelected);
-
-            if (container == null && ContainerSubPanel.class.isAssignableFrom(clazz)) {
-                ConsolePanel sp = PluginsRepository.getPanelPlugin(availableSelected, getConsole());
-                if (sp != null) {
-                    getConsole().getMainPanel().addSubPanel(sp);
-                    container = (ContainerSubPanel) sp;
-                    sp.init();
-                    getConsole().informSubPanelListener(sp, SubPanelChangeAction.ADDED);
-                  //  refreshActivePlugins();
-                    //warnSettingsWindowAdd(sp);
-                    getConsole().setConsoleChanged(true);
-                }
-                
-                return;
-            }
-
-            if (container != null && ContainerSubPanel.class.isAssignableFrom(clazz)) {
-                return;
-            }
-            
-            if (ConsolePanel.class.isAssignableFrom(clazz)) {
-                if (container != null) {
-                    ConsolePanel sp = PluginsRepository.getPanelPlugin(availableSelected, getConsole());
-                    container.addSubPanel(sp);
-                    sp.init();
-                    getConsole().informSubPanelListener(sp, SubPanelChangeAction.ADDED);
-                    
-                    NeptusLog.pub().warn(
-                            "Added new console panel: " + sp.getName() + " Class name : "
-                                    + sp.getClass().getCanonicalName());
-                    getConsole().setConsoleChanged(true);
-                }
-            }
-
-            if (ConsoleLayer.class.isAssignableFrom(clazz)) {
-                ConsoleLayer sp = PluginsRepository.getConsoleLayer(availableSelected);
-                getConsole().addMapLayer(sp);
-              
-                NeptusLog.pub().warn(
-                        "Added new console layer: " + sp.getName() + " Class name : "
-                                + sp.getClass().getCanonicalName());
-                getConsole().setConsoleChanged(true);
-            }
-
-            if (ConsoleInteraction.class.isAssignableFrom(clazz)) {
-                ConsoleInteraction sp = PluginsRepository.getConsoleInteraction(availableSelected);
-                getConsole().addInteraction(sp);
-               
-                NeptusLog.pub().warn(
-                        "Added new console interaction: " + sp.getName() + " Class name : "
-                                + sp.getClass().getCanonicalName());
-                getConsole().setConsoleChanged(true);
-            }
-        }
-    });
-
-}
 }
 
