@@ -145,7 +145,7 @@ public class AutoPlanner extends ConsolePanel {
     //Algumas das variaveis anteriores convertidas para INT (é melhor mesmo usar as STRINGs convertidas para INT, depois de tantas alterações nao sei se estas ainda estao OK))
     private static float Focal_len, angleInt, resInt, resH, resV;
     private static int GSDInt=10;
-    public static float Alt, GSD;
+    public static float Altitud3, GSD;
     
     
    
@@ -557,17 +557,17 @@ public class AutoPlanner extends ConsolePanel {
                 
                 
                 if (altV > altH)
-                    Alt = altV;
+                    Altitud3 = altV;
                 else 
-                    Alt =altH;
+                    Altitud3 =altH;
                 
-                AltSen.setText(String.valueOf(Alt));  //Alt(altitude) a ser calculado
+                AltSen.setText(String.valueOf(Altitud3));  //Altitud3(altitude) a ser calculado
                 
                 //Calculo Para a distancia entre as retas
                 
-                float coberturaHor = (Alt * Float.valueOf(Width) )/ Focal_len;
+                float coberturaHor = (Altitud3 * Float.valueOf(Width) )/ Focal_len;
                 
-                float coberturaVert = (Alt * Float.valueOf(Heigth) )/ Focal_len;
+                float coberturaVert = (Altitud3 * Float.valueOf(Heigth) )/ Focal_len;
                 
                 float cob;
                 if (coberturaHor > coberturaVert)
