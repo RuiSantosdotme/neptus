@@ -439,25 +439,13 @@ public class AutoPlanner extends ConsolePanel {
                 
         ResList = new JComboBox<>(res);
         add(ResList);
-        selectedRes = (String) ResList.getSelectedItem();
+      //  selectedRes = (String) ResList.getSelectedItem();
         
 
-        String[] tokens = selectedRes.split("x");
-
-        int i=0;
-        
-        for (String t : tokens)
-        { System.out.println(t);
-        i++;
        
-        if(i==1)
-        resH = Float.valueOf(t);
-        if (i==2)
-        resV=Float.valueOf(t);
-        
-        }
-        
-        i=0;
+
+        resH = (float) 640.0;
+        resV = (float) 480.0;
         
         
         this.add(ResIdValueLabel,"wrap");
@@ -470,18 +458,10 @@ public class AutoPlanner extends ConsolePanel {
              
                 String[] tokens = selectedRes.split("x");
 
-                int i=0;
-                
-               
                 
                 resH = Float.valueOf(tokens[1]);
                 resV = Float.valueOf(tokens[2]);
                 
-              
-                
-                i=0;
-                
-               
                
             }
             
