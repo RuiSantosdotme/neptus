@@ -141,10 +141,11 @@ public class AutoPlanner extends ConsolePanel {
     
     //Variaveis globais para aceder à opçao escolhida
     public static String selectedCam, selectedVeic, selectedRes, height, angle, FocusLength, Width, Heigth;
-    
+    public static float distanciaRetas;
     //Algumas das variaveis anteriores convertidas para INT (é melhor mesmo usar as STRINGs convertidas para INT, depois de tantas alterações nao sei se estas ainda estao OK))
-    public static int Focal_len, angleInt, resInt, GSDInt;
-    String Alt;
+    private static float Focal_len, angleInt, resInt, resH, resV;
+    private static int GSDInt=10;
+    public static float Alt, GSD;
     
     
    
@@ -241,7 +242,7 @@ public class AutoPlanner extends ConsolePanel {
     
         
         //ComboBox para Camera
-        String[] Cam = new String[] {" ", "Go Pro", "Sony"};
+        String[] Cam = new String[] {" ", "Go Pro", "Canon"};
         CamList = new JComboBox<>(Cam);
         add(CamList);
         selectedCam = (String) CamList.getSelectedItem();
@@ -277,27 +278,29 @@ public class AutoPlanner extends ConsolePanel {
                     
                 {
                     focText.setText("8");
-                    widthSen.setText("6.17");
-                    heigthSen.setText("4.55");
+                    widthSen.setText("5.76");
+                    heigthSen.setText("4.29");
                     
                     
                     
                     //Criar Variaveis globais para guardar os dados
                     
                     FocusLength = "8";
-                    Width = "6.17";
-                    Heigth = "4.55";
+                    Focal_len = 8;
+                    Width = "5.76";
+                    Heigth = "4.29";
                     
                 } else 
-                if(selectedCam == "Sony")
+                if(selectedCam == "Canon")
                 {
                     focText.setText("28");
-                    widthSen.setText("6.16");
-                    heigthSen.setText("4.62");
+                    widthSen.setText("6.17");
+                    heigthSen.setText("4.56");
                     
                     FocusLength = "28";
-                    Width = "6.16";
-                    Heigth = "4.62";
+                    Focal_len = 28;
+                    Width = "6.17";
+                    Heigth = "4.56";
                     
                     
                   //Criar Variaveis globais para guardar os dados
@@ -311,6 +314,7 @@ public class AutoPlanner extends ConsolePanel {
                     if(selectedCam == "")
                     {
                         FocusLength = focText.getText();
+                        Focal_len = Float.valueOf(FocusLength);
                         Width = widthSen.getText();
                         Heigth = heigthSen.getText();
                         
@@ -429,11 +433,31 @@ public class AutoPlanner extends ConsolePanel {
         
         this.add(ResIdLabel);
         
-        String[] res = new String[] {"600x800", "1024x780", "1600x1200"};
+        String[] res = new String[] {"640x480", "1024x780", "1600x1200"};
+        
+        
                 
         ResList = new JComboBox<>(res);
         add(ResList);
-        selectedVeic = (String) ResList.getSelectedItem();
+        selectedRes = (String) ResList.getSelectedItem();
+        
+
+        String[] tokens = selectedRes.split("x");
+
+        int i=0;
+        
+        for (String t : tokens)
+        { System.out.println(t);
+        i++;
+       
+        if(i==1)
+        resH = Float.valueOf(t);
+        if (i==2)
+        resV=Float.valueOf(t);
+        
+        }
+        
+        i=0;
         
         
         this.add(ResIdValueLabel,"wrap");
@@ -442,8 +466,21 @@ public class AutoPlanner extends ConsolePanel {
             @Override
             public void actionPerformed(ActionEvent e) {
             
-                resInt = (int) ResList.getSelectedItem();
-                System.out.println("resInt: "+ resInt);
+                selectedRes= (String) ResList.getSelectedItem();
+             
+                String[] tokens = selectedRes.split("x");
+
+                int i=0;
+                
+               
+                
+                resH = Float.valueOf(tokens[1]);
+                resV = Float.valueOf(tokens[2]);
+                
+              
+                
+                i=0;
+                
                
                
             }
@@ -484,9 +521,10 @@ public class AutoPlanner extends ConsolePanel {
                 } catch ( java.text.ParseException d ) {  }
                 
              
-                GSDInt = (Integer) spinnerG.getValue();
+                GSDInt = (int) spinnerG.getValue();
                 
                 System.out.println("GSD: "+ GSDInt);
+                
                
             }
           });
@@ -522,7 +560,50 @@ public class AutoPlanner extends ConsolePanel {
                 
                //o codigo deste botao irá fazer o calculo, acho eu ...
                 
-                AltSen.setText(Alt);  //Alt(altitude) a ser calculado
+                float altH = (float) ( (Float.valueOf(GSDInt) * Focal_len * resH ) / (100.0 * Float.valueOf(Width))); 
+                
+                float altV = (float) ((Float.valueOf(GSDInt) * Focal_len * resV ) / (100.0 *Float.valueOf(Heigth) ));
+                
+                          
+                
+                System.out.println("resH" + resH);
+                System.out.println("resV"+ resV);
+                
+                System.out.println("w" + Float.valueOf(Width));
+                System.out.println("h"+ Float.valueOf(Heigth));
+                
+                System.out.println("h" + altH);
+                System.out.println("v"+ altV);
+                
+                
+                if (altV > altH)
+                    Alt = altV;
+                else 
+                    Alt =altH;
+                
+                AltSen.setText(String.valueOf(Alt));  //Alt(altitude) a ser calculado
+                
+                //Calculo Para a distancia entre as retas
+                
+                float coberturaHor = (Alt * Float.valueOf(Width) )/ Focal_len;
+                
+                float coberturaVert = (Alt * Float.valueOf(Heigth) )/ Focal_len;
+                
+                float cob;
+                if (coberturaHor > coberturaVert)
+                    cob = coberturaHor;
+                else 
+                    cob =coberturaVert;
+                
+                distanciaRetas = (float) ( (1-0.3) * cob); 
+                
+                System.out.println("h " + coberturaHor);
+                System.out.println("v "+ coberturaVert);
+                System.out.println("d "+ distanciaRetas);
+                
+                
+                
+                
                 
                 
             }
