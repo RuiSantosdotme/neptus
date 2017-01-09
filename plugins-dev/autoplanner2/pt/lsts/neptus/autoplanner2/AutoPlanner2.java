@@ -54,6 +54,7 @@ import pt.lsts.neptus.i18n.I18n;
 
 import pt.lsts.neptus.console.ConsoleLayout;
 import pt.lsts.neptus.console.ConsolePanel;
+import pt.lsts.neptus.console.plugins.containers.LayoutProfileProvider;
 import pt.lsts.neptus.plugins.PluginDescription;
 
 
@@ -142,6 +143,19 @@ public class AutoPlanner2 extends ConsolePanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                
+                
+                System.out.println("TESTE DO BOTAO");
+
+                String profileName = "Edit Mode";
+
+                Vector<LayoutProfileProvider> c = getConsole().getSubPanelsOfInterface(LayoutProfileProvider.class);
+
+                if (c.isEmpty()) {
+                    System.err.println("Não existem perfis");
+                }
+
+                LayoutProfileProvider p = c.get(0);
+                p.setActiveProfile(profileName);
                
                 
                 

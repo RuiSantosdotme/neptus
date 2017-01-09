@@ -144,8 +144,8 @@ public class AutoPlanner extends ConsolePanel {
     public static float distanciaRetas;
     //Algumas das variaveis anteriores convertidas para INT (é melhor mesmo usar as STRINGs convertidas para INT, depois de tantas alterações nao sei se estas ainda estao OK))
     private static float Focal_len, angleInt, resInt, resH, resV;
-    private static int GSDInt=10;
-    public static float Altitud3, GSD;
+    private static int GSDInt=10, altInt ;
+    public static float  Altitud3,GSD;
     
     
    
@@ -176,28 +176,22 @@ public class AutoPlanner extends ConsolePanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                
-                
-                PolygonInteraction.realCoordPolygon.CreateGrid(100, 0, 150, 0, 0, 0, null, false, 0, 0, getConsole());
+                // PolygonInteraction.realCoordPolygon.CreateGrid(100, 0, 150, 0, 0, 0, null, false, 0, 0,
+                // getConsole());
                 System.out.println("TESTE DO BOTAO");
-                
-                
-                          
-            /*  String profileName = "Flight Mode";
-              
-              Vector<LayoutProfileProvider> c = getConsole().getSubPanelsOfInterface(LayoutProfileProvider.class) ;
-              
-              GroupLayoutContainer f = new GroupLayoutContainer(getConsole());
-             
-              f.setActiveProfile("Flight Mode");*/
-                
-             
-             
-             
-             
+
+                String profileName = "Flight Mode";
+
+                Vector<LayoutProfileProvider> c = getConsole().getSubPanelsOfInterface(LayoutProfileProvider.class);
+
+                if (c.isEmpty()) {
+                    System.err.println("Não existem perfis");
+                }
+
+                LayoutProfileProvider p = c.get(0);
+                p.setActiveProfile(profileName);
             }
 
-          
         };
         
         FlightModeB = new JButton(FlightMode);
@@ -559,9 +553,11 @@ public class AutoPlanner extends ConsolePanel {
                 if (altV > altH)
                     Altitud3 = altV;
                 else 
-                    Altitud3 =altH;
+                   Altitud3 =   altH;
                 
-                AltSen.setText(String.valueOf(Altitud3));  //Altitud3(altitude) a ser calculado
+                altInt = (int) Altitud3;
+                
+                AltSen.setText(String.valueOf(altInt));  //Altitud3(altitude) a ser calculado
                 
                 //Calculo Para a distancia entre as retas
                 
@@ -581,10 +577,7 @@ public class AutoPlanner extends ConsolePanel {
                 System.out.println("v "+ coberturaVert);
                 System.out.println("d "+ distanciaRetas);
                 
-                
-                
-                
-                
+                           
                 
             }
         };
