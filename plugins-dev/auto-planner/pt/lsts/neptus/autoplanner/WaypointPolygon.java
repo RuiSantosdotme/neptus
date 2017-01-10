@@ -44,7 +44,7 @@ public class WaypointPolygon {
     public int idOrientacao;
     
     /**
-     * 
+     * dd
      */
     public WaypointPolygon(LocationType point, int idOrientacao) {
         this.point = point;

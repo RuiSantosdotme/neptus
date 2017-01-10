@@ -159,7 +159,7 @@ public class AutoPlanner extends ConsolePanel {
         setSize(300, 300);
         this.setLayout(new MigLayout("ins 0"));
        
-       
+       //
         //código adaptado do PLanControlStatePanel.java
         
         setSize(300, 300);

@@ -33,7 +33,7 @@ package pt.lsts.neptus.autoplanner;
 
 /**
  * @author grifo
- *
+ *ss
  */
 public class Rect {
 

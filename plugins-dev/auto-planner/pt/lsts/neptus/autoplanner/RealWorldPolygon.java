@@ -285,6 +285,8 @@ public class RealWorldPolygon {
                         break;
                     }
                     
+                    //
+                    
 //                   double dist1 = inter.getDistanceInMeters(line.getP1());
 //                   double dist2 = inter.getDistanceInMeters(line.getP2());
 //                   boolean bool1 = ((inter.getLatitudeDegs() > Math.min(linePolygon.getP1().getLatitudeDegs(), linePolygon.getP2().getLatitudeDegs())) && 

@@ -68,7 +68,7 @@ public class PolygonInteraction extends InteractionAdapter {
         this.fill = fill;
         this.undoManager = undoManager;
     }    
-    
+    //
     @Override
     public void mousePressed(MouseEvent event, StateRenderer2D source) {
         
