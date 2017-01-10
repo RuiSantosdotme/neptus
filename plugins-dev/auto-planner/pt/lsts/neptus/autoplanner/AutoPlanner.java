@@ -137,7 +137,7 @@ public class AutoPlanner extends ConsolePanel {
     private JTextField focText, heigthSen, widthSen;
     JLabel AltSen;
     
-    public JButton FlightModeB;
+ 
     private JButton createPlan, EditPlan, DelPlan, PausePlan, ResumePlan, EditMode ;
     
     //Variaveis globais para aceder à opçao escolhida
