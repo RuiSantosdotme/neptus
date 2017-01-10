@@ -1,6 +1,5 @@
-package pt.lsts.neptus.autoplanner2;
+package pt.lsts.neptus.AutoPlanner_planEdit;
 
-import pt.lsts.neptus.plugins.uavs.panels.UavHUDPanel;
 
 import java.awt.Component;
 
@@ -62,34 +61,22 @@ import pt.lsts.neptus.plugins.PluginDescription;
  * @author Equipa C - SEAI 2016
  *
  */
-@PluginDescription(name = "Auto Planner 2")
+
+@PluginDescription(name = "Auto Planner - Plan edition")
 //@Popup(accelerator='Y',pos = POSITION.RIGHT, height=200, width = 200)
 @SuppressWarnings("serial")
 
-public class AutoPlanner2 extends ConsolePanel {
+public class autoplanner_planedit extends ConsolePanel {
 
     /**
      * @param console
      */
  
 
-
-    /**
-     * @param console
-     * 
-     * 
-     */
-
-    
     private JButton EditModeB, PausePlan, ResumePlan;
 
     
-
-   
-    
-   
-    
-    public AutoPlanner2(ConsoleLayout console) {
+    public autoplanner_planedit(ConsoleLayout console) {
         super(console);
     }
     
@@ -97,33 +84,9 @@ public class AutoPlanner2 extends ConsolePanel {
     public void initSubPanel() {
         setSize(300, 300);
         this.setLayout(new MigLayout("ins 0"));
-       
-       
-
-        setSize(300, 300);
-        this.setLayout(new MigLayout("ins 0"));
-   
         
-        //3 botoes sem funçoes para já
-        Action PausePlanAction = new AbstractAction(I18n.text("Pause Plan")) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                
-                
-              //codigo para pausar aqui
-                
-              
-                
-                
-            }
-        };
         
-        PausePlan = new JButton(PausePlanAction);
-        add(PausePlan);
-        
-        Action ResumePlanAction = new AbstractAction(I18n.text("Resume Plan")) {
+        Action EditPlanAction = new AbstractAction(I18n.text("Edit Plan")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -135,61 +98,28 @@ public class AutoPlanner2 extends ConsolePanel {
             }
         };
         
-        ResumePlan = new JButton(ResumePlanAction);
-        add(ResumePlan,"wrap");
+        JButton EditPlan = new JButton(EditPlanAction);
+        add(EditPlan);
         
-        
-        JButton nothingB = new JButton("Edit Mode");
-        add(nothingB, "wrap");
-        
-        nothingB.setVisible(false);
-        
-       /* JButton nothingB2 = new JButton("Edit Mode");
-        add(nothingB2, "wrap");
-        
-        nothingB2.setVisible(false);*/
-        
-        JLabel pc = new JLabel(I18n.text("Mode Change"));
-        add(pc, "wrap");
-        
-           
-      
-        
-        Action EditModeAction = new AbstractAction(I18n.text("Edit Mode")) {
+        Action DelPlanAction = new AbstractAction(I18n.text("Delete Plan")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                
-                
-                System.out.println("TESTE DO BOTAO");
-
-                String profileName = "Edit Mode";
-
-                Vector<LayoutProfileProvider> c = getConsole().getSubPanelsOfInterface(LayoutProfileProvider.class);
-
-                if (c.isEmpty()) {
-                    System.err.println("Não existem perfis");
-                }
-
-                LayoutProfileProvider p = c.get(0);
-                p.setActiveProfile(profileName);
                
                 
                 
-                //inserir codigo aqui para trocar de perfil
+                //inserir codigo aqui
                
             }
         };
         
-        EditModeB = new JButton(EditModeAction);
-        add(EditModeB, "wrap");
+        JButton DelPlan = new JButton(DelPlanAction);
+        add(DelPlan);
+       
       
-      
         
-        
-        
-        
-        
+   
         
     }
     

@@ -68,6 +68,8 @@
 	<classpathentry kind="src" path="plugins-dev/txtmsg"/>
 	<classpathentry kind="src" path="plugins-dev/auto-planner"/>
 	<classpathentry kind="src" path="plugins-dev/autoplanner2"/>
+	<classpathentry kind="src" path="plugins-dev/AutoPlanner-planEdit"/>
+	<classpathentry kind="src" path="plugins-dev/AutoPlanner-profile"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.17.jar"/>
 	<classpathentry kind="lib" path="lib/xerces-2.7.1/xml-apis.jar"/>
 	<classpathentry kind="lib" path="lib/xerces-2.7.1/xercesImpl.jar"/>

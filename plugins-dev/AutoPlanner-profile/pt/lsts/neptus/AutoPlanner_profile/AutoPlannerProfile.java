@@ -1,6 +1,5 @@
-package pt.lsts.neptus.autoplanner2;
+package pt.lsts.neptus.AutoPlanner_profile;
 
-import pt.lsts.neptus.plugins.uavs.panels.UavHUDPanel;
 
 import java.awt.Component;
 
@@ -56,40 +55,29 @@ import pt.lsts.neptus.console.ConsoleLayout;
 import pt.lsts.neptus.console.ConsolePanel;
 import pt.lsts.neptus.console.plugins.containers.LayoutProfileProvider;
 import pt.lsts.neptus.plugins.PluginDescription;
+import pt.lsts.neptus.plugins.map.interactions.PolygonInteraction;
 
 
 /**
  * @author Equipa C - SEAI 2016
  *
  */
-@PluginDescription(name = "Auto Planner 2")
+
+@PluginDescription(name = "Auto Planner - Profile Change")
 //@Popup(accelerator='Y',pos = POSITION.RIGHT, height=200, width = 200)
 @SuppressWarnings("serial")
 
-public class AutoPlanner2 extends ConsolePanel {
+public class AutoPlannerProfile extends ConsolePanel {
 
     /**
      * @param console
      */
  
 
-
-    /**
-     * @param console
-     * 
-     * 
-     */
-
-    
     private JButton EditModeB, PausePlan, ResumePlan;
 
     
-
-   
-    
-   
-    
-    public AutoPlanner2(ConsoleLayout console) {
+    public AutoPlannerProfile(ConsoleLayout console) {
         super(console);
     }
     
@@ -97,73 +85,20 @@ public class AutoPlanner2 extends ConsolePanel {
     public void initSubPanel() {
         setSize(300, 300);
         this.setLayout(new MigLayout("ins 0"));
-       
-       
-
-        setSize(300, 300);
-        this.setLayout(new MigLayout("ins 0"));
-   
-        
-        //3 botoes sem funçoes para já
-        Action PausePlanAction = new AbstractAction(I18n.text("Pause Plan")) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                
-                
-              //codigo para pausar aqui
-                
-              
-                
-                
-            }
-        };
-        
-        PausePlan = new JButton(PausePlanAction);
-        add(PausePlan);
-        
-        Action ResumePlanAction = new AbstractAction(I18n.text("Resume Plan")) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                
-                
-               //inserir codigo aqui
-                
-            }
-        };
-        
-        ResumePlan = new JButton(ResumePlanAction);
-        add(ResumePlan,"wrap");
-        
-        
-        JButton nothingB = new JButton("Edit Mode");
-        add(nothingB, "wrap");
-        
-        nothingB.setVisible(false);
-        
-       /* JButton nothingB2 = new JButton("Edit Mode");
-        add(nothingB2, "wrap");
-        
-        nothingB2.setVisible(false);*/
         
         JLabel pc = new JLabel(I18n.text("Mode Change"));
         add(pc, "wrap");
         
-           
-      
         
-        Action EditModeAction = new AbstractAction(I18n.text("Edit Mode")) {
+        Action FlightMode = new AbstractAction(I18n.text("Flight Mode")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+
                
-                
                 System.out.println("TESTE DO BOTAO");
 
-                String profileName = "Edit Mode";
+                String profileName = "Flight Mode";
 
                 Vector<LayoutProfileProvider> c = getConsole().getSubPanelsOfInterface(LayoutProfileProvider.class);
 
@@ -173,23 +108,24 @@ public class AutoPlanner2 extends ConsolePanel {
 
                 LayoutProfileProvider p = c.get(0);
                 p.setActiveProfile(profileName);
-               
                 
                 
-                //inserir codigo aqui para trocar de perfil
-               
+                // PolygonInteraction.realCoordPolygon.CreateGrid(100, 0, 150, 0, 0, 0, null, false, 0, 0,getConsole());
+           
+            
             }
+
         };
         
-        EditModeB = new JButton(EditModeAction);
-        add(EditModeB, "wrap");
+        JButton FlightModeB = new JButton(FlightMode);
+        add(FlightModeB,"wrap");
+        
+        
+    
+       
       
-      
         
-        
-        
-        
-        
+   
         
     }
     

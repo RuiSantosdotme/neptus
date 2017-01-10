@@ -134,7 +134,8 @@ public class AutoPlanner extends ConsolePanel {
     private Map<String, Object> pluginsMap = new LinkedHashMap<String, Object>();
     private Map<String, Class<?>> plugins = new LinkedHashMap<String, Class<?>>();
     private ContainerSubPanel container;
-    private JTextField focText, heigthSen, widthSen, AltSen;
+    private JTextField focText, heigthSen, widthSen;
+    JLabel AltSen;
     
     public JButton FlightModeB;
     private JButton createPlan, EditPlan, DelPlan, PausePlan, ResumePlan, EditMode ;
@@ -166,58 +167,9 @@ public class AutoPlanner extends ConsolePanel {
         this.setLayout(new MigLayout("ins 0"));
    
         
-  
-        
-           
-
-        
-        Action FlightMode = new AbstractAction(I18n.text("Flight Mode")) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                PolygonInteraction.realCoordPolygon.CreateGrid(100, 0, 150, 0, 0, 0, null, false, 0, 0,
-                getConsole());
-                System.out.println("TESTE DO BOTAO");
-
-                String profileName = "Flight Mode";
-
-                Vector<LayoutProfileProvider> c = getConsole().getSubPanelsOfInterface(LayoutProfileProvider.class);
-
-                if (c.isEmpty()) {
-                    System.err.println("Não existem perfis");
-                }
-
-                LayoutProfileProvider p = c.get(0);
-                p.setActiveProfile(profileName);
-            }
-
-        };
-        
-        FlightModeB = new JButton(FlightMode);
-        add(FlightModeB,"wrap");
-        
-        
-        
-        
-     
-       
-       
-        
-
-        
-       
-        
       //  this.add(bValueLabel, "wrap");
         
-        
-        entValueLabel = new JLabel();
-        entValueLabel.setText("");
-        entLabel = new JLabel();
-        entLabel.setText("<html><b>" + I18n.text("Entradas") + ": ");
-                           
-        this.add(entLabel, "wrap");
-        
+   
         
         stateValueLabel = new JLabel();
         stateValueLabel.setText("");
@@ -236,7 +188,7 @@ public class AutoPlanner extends ConsolePanel {
     
         
         //ComboBox para Camera
-        String[] Cam = new String[] {" ", "Go Pro", "Canon"};
+        String[] Cam = new String[] {"Canon", "Go Pro", "Custom"};
         CamList = new JComboBox<>(Cam);
         add(CamList);
         selectedCam = (String) CamList.getSelectedItem();
@@ -244,6 +196,7 @@ public class AutoPlanner extends ConsolePanel {
         
         this.add(stateValueLabel, "wrap");
         
+      
         
        
         
@@ -276,6 +229,12 @@ public class AutoPlanner extends ConsolePanel {
                     heigthSen.setText("4.29");
                     
                     
+                    focText.setEnabled(false);
+                    widthSen.setEnabled(false);
+                    heigthSen.setEnabled(false);
+                    
+                    
+                    
                     
                     //Criar Variaveis globais para guardar os dados
                     
@@ -296,6 +255,10 @@ public class AutoPlanner extends ConsolePanel {
                     Width = "6.17";
                     Heigth = "4.56";
                     
+                    focText.setEnabled(false);
+                    widthSen.setEnabled(false);
+                    heigthSen.setEnabled(false);
+                    
                     
                   //Criar Variaveis globais para guardar os dados
                     
@@ -305,12 +268,17 @@ public class AutoPlanner extends ConsolePanel {
                 
                 else 
                     
-                    if(selectedCam == "")
+                    if(selectedCam == "Custom")
                     {
                         FocusLength = focText.getText();
                         Focal_len = Float.valueOf(FocusLength);
                         Width = widthSen.getText();
                         Heigth = heigthSen.getText();
+                        
+                        
+                        focText.setEnabled(true);
+                        widthSen.setEnabled(true);
+                        heigthSen.setEnabled(true);
                         
                       //Criar Variaveis globais para guardar os dados, neste caso ele guarda o que estiver escrito nas caixas de texto
                         
@@ -359,6 +327,19 @@ public class AutoPlanner extends ConsolePanel {
             
                 selectedVeic = (String) VeicList.getSelectedItem();
                 System.out.println("Veiculo selecionado: "+ selectedVeic);
+                
+                if (selectedVeic == "X8 SkyWalker")
+                {
+                    selectedVeic = "x8-02";                  
+                    
+                } 
+                else
+                if (selectedVeic == "Mariner")
+                {
+                    selectedVeic = "mariner-02";                     
+                }
+                
+                
                
                
             }
@@ -515,7 +496,7 @@ public class AutoPlanner extends ConsolePanel {
         
         this.add(AltIdLabel);
         
-        AltSen= new JTextField();
+        AltSen= new JLabel();
         
         AltSen.setPreferredSize( new Dimension( 40, 24 ) );
         
@@ -531,6 +512,27 @@ public class AutoPlanner extends ConsolePanel {
             public void actionPerformed(ActionEvent e) {
 
                 
+                if(selectedCam == "Custom")
+                {
+                    
+                    
+                    focText.setEnabled(true);
+                    widthSen.setEnabled(true);
+                    heigthSen.setEnabled(true);
+                    
+                    FocusLength = focText.getText();
+                    Focal_len = Float.valueOf(FocusLength);
+                    Width = widthSen.getText();
+                    Heigth = heigthSen.getText();
+                    
+                    
+                    
+                  //Criar Variaveis globais para guardar os dados, neste caso ele guarda o que estiver escrito nas caixas de texto
+                    
+                    
+                    
+                }
+            
                 
                //o codigo deste botao irá fazer o calculo, acho eu ...
                 
@@ -577,6 +579,8 @@ public class AutoPlanner extends ConsolePanel {
                 System.out.println("v "+ coberturaVert);
                 System.out.println("d "+ distanciaRetas);
                 
+                
+                
                            
                 
             }
@@ -585,38 +589,22 @@ public class AutoPlanner extends ConsolePanel {
         createPlan = new JButton(CreatePlanAction);
         add(createPlan);
         
-        Action EditPlanAction = new AbstractAction(I18n.text("Edit Plan")) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                
-                
-               //inserir codigo aqui
-                
-            }
-        };
         
-        EditPlan = new JButton(EditPlanAction);
-        add(EditPlan);
-        
-        Action DelPlanAction = new AbstractAction(I18n.text("Delete Plan")) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-               
-               
-                
-                
-                //inserir codigo aqui
-               
-            }
-        };
-        
-        DelPlan = new JButton(DelPlanAction);
-        add(DelPlan);
       
       
+        // Canon como camera pre definida
+        focText.setText("28");
+        widthSen.setText("6.17");
+        heigthSen.setText("4.56");
+        
+        FocusLength = "28";
+        Focal_len = 28;
+        Width = "6.17";
+        Heigth = "4.56";
+        
+        focText.setEnabled(false);
+        widthSen.setEnabled(false);
+        heigthSen.setEnabled(false);
         
         
         
