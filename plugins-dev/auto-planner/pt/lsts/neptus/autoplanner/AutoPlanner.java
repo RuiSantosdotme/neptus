@@ -176,8 +176,8 @@ public class AutoPlanner extends ConsolePanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                PolygonInteraction.realCoordPolygon.CreateGrid(100, 0, 150, 0, 0, 0, null, false, 0, 0,
-                getConsole());
+                //PolygonInteraction.realCoordPolygon.CreateGrid(100, 0, 150, 0, 0, 0, null, false, 0, 0,
+                //getConsole());
                 System.out.println("TESTE DO BOTAO");
 
                 String profileName = "Flight Mode";
