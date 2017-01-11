@@ -631,5 +631,12 @@ public class RealWorldPolygon {
         return orderedWaypoints;
     }
 
+    /**
+     * @return the polygonLL
+     */
+    public final List<LocationType> getPolygonLL() {
+        return polygonLL;
+    }
+
 
 }
