@@ -401,7 +401,7 @@ public class RealWorldPolygon {
         
         PlanCreator pc = new PlanCreator(console.getConsole().getMission());
         
-        pc.setZ(40, pt.lsts.neptus.mp.ManeuverLocation.Z_UNITS.HEIGHT);
+        pc.setZ(100, pt.lsts.neptus.mp.ManeuverLocation.Z_UNITS.ALTITUDE);
         
         pc.setLocation(console.getConsole().getMission().getHomeRef());
         
@@ -438,6 +438,7 @@ public class RealWorldPolygon {
         PlanType plan = pc.getPlan();
         plan.setId("CoveragePlan");
         plan.setVehicle("x8-02");
+
         console.getConsole().getMission().addPlan(plan);
         console.getConsole().warnMissionListeners();
         console.getConsole().setPlan(plan);
