@@ -33,6 +33,7 @@ import java.util.Random;
 import java.util.Vector;
 
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
@@ -181,12 +182,60 @@ public class AutoPlanner extends ConsolePanel {
      
         
 
-        this.add(stateLabel, "");
+        
+        
+
+        nodeIdValueLabel = new JLabel();
+        nodeIdValueLabel.setText("");
+        nodeIdLabel = new JLabel();
+        nodeIdLabel.setText("<html><b>" + I18n.text("Vehicle") + ": ");
+        
+        this.add(nodeIdLabel);
+
         
   
         
-    
         
+ //ComboBox para veículo 
+        
+        String[] Veiculo = new String[] {"X8 SkyWalker", "Mariner"};
+        
+        VeicList = new JComboBox<>(Veiculo);
+        add(VeicList);
+        selectedVeic = (String) VeicList.getSelectedItem();
+              
+        this.add(nodeIdValueLabel, "wrap");
+        
+
+        
+        ActionListener VeicActionListener = new ActionListener() {//add actionlistner to listen for change
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            
+                selectedVeic = (String) VeicList.getSelectedItem();
+                System.out.println("Veiculo selecionado: "+ selectedVeic);
+                
+                if (selectedVeic == "X8 SkyWalker")
+                {
+                    selectedVeic = "x8-02";                  
+                    
+                } 
+                else
+                if (selectedVeic == "Mariner")
+                {
+                    selectedVeic = "mariner-02";                     
+                }
+                
+                
+               
+               
+            }
+            
+        };
+        
+        VeicList.addActionListener(VeicActionListener);
+    
+        this.add(stateLabel, "");
         //ComboBox para Camera
         String[] Cam = new String[] {"Canon", "Go Pro", "Custom"};
         CamList = new JComboBox<>(Cam);
@@ -302,51 +351,7 @@ public class AutoPlanner extends ConsolePanel {
               
         
 
-        nodeIdValueLabel = new JLabel();
-        nodeIdValueLabel.setText("");
-        nodeIdLabel = new JLabel();
-        nodeIdLabel.setText("<html><b>" + I18n.text("Vehicle") + ": ");
-        
-        this.add(nodeIdLabel);
-
-        //ComboBox para veículo 
-        
-        String[] Veiculo = new String[] {"X8 SkyWalker", "Mariner"};
-        
-        VeicList = new JComboBox<>(Veiculo);
-        add(VeicList);
-        selectedVeic = (String) VeicList.getSelectedItem();
-              
-        this.add(nodeIdValueLabel, "wrap");
-        
-
-        
-        ActionListener VeicActionListener = new ActionListener() {//add actionlistner to listen for change
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            
-                selectedVeic = (String) VeicList.getSelectedItem();
-                System.out.println("Veiculo selecionado: "+ selectedVeic);
-                
-                if (selectedVeic == "X8 SkyWalker")
-                {
-                    selectedVeic = "x8-02";                  
-                    
-                } 
-                else
-                if (selectedVeic == "Mariner")
-                {
-                    selectedVeic = "mariner-02";                     
-                }
-                
-                
-               
-               
-            }
-            
-        };
-        
-        VeicList.addActionListener(VeicActionListener);
+       
         
         FocIdValueLabel = new JLabel();
         FocIdValueLabel.setText("");
@@ -444,6 +449,38 @@ public class AutoPlanner extends ConsolePanel {
         
         ResList.addActionListener(ResActionListener);
         
+        
+        
+        
+        JLabel AngleIdLabel = new JLabel();
+        AngleIdLabel.setText("<html><b>" + I18n.text("Angle: (degrees)") + ": " + 0);
+        
+        this.add(AngleIdLabel);
+        
+        //Slides para angulo
+        
+        JSlider framesPerSecond = new JSlider(JSlider.HORIZONTAL, 0, 90, 0);
+        
+        framesPerSecond.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent ce) {
+                System.out.println(((JSlider) ce.getSource()).getValue());
+                AngleIdLabel.setText("<html><b>" + I18n.text("Angle: (degrees)") + ": " + ((JSlider) ce.getSource()).getValue());
+            }
+        });
+        
+        
+        add(framesPerSecond, "wrap");
+        //framesPerSecond.addChangeListener(this);
+        
+      //Turn on labels at major tick marks.
+        framesPerSecond.setMajorTickSpacing(45);
+        framesPerSecond.setMinorTickSpacing(1);
+        framesPerSecond.setPaintTicks(true);
+        framesPerSecond.setPaintLabels(true);
+        
+        
+        
         //GSD - Usar esta spinbox
         
         
@@ -503,6 +540,8 @@ public class AutoPlanner extends ConsolePanel {
         this.add(AltSen,"wrap");
         
         
+       
+       
         
         
         //3 botoes sem funçoes para já
