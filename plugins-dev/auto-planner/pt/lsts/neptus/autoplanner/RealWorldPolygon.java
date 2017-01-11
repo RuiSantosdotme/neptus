@@ -405,30 +405,6 @@ public class RealWorldPolygon {
         
         pc.setLocation(console.getConsole().getMission().getHomeRef());
         
-        
-        //pc.move(100, 50);
-//        pc.setLocation(new LocationType(41.8567, -6.7062));
-//        pc.addGoto(new LinkedHashMap<>());
-//        pc.setLocation(new LocationType(41.8567, -6.7046));
-//        pc.addGoto(new LinkedHashMap<>());
-//        pc.setLocation(new LocationType(41.8565, -6.7046));
-//        pc.addGoto(new LinkedHashMap<>());
-//        pc.setLocation(new LocationType(41.8565, -6.7062));
-//        pc.addGoto(new LinkedHashMap<>());
-//        pc.setLocation(new LocationType(41.8563, -6.7062));
-//        pc.addGoto(new LinkedHashMap<>());
-//        pc.setLocation(new LocationType(41.8563, -6.7046));
-//        pc.addGoto(new LinkedHashMap<>());
-//        pc.setLocation(new LocationType(41.8561, -6.7046));
-//        pc.addGoto(new LinkedHashMap<>());
-//        pc.setLocation(new LocationType(41.8561, -6.7062));
-//        pc.addGoto(new LinkedHashMap<>());
-        
-//        for (WaypointPolygon pnt : waypoints) {
-//            pc.setLocation(pnt.point);
-//            pc.addGoto(new LinkedHashMap<>());
-//        }
-        
         for (LocationType pnt : orderedWaypoints) {
             pc.setLocation(pnt);
             pc.addGoto(new LinkedHashMap<>());
