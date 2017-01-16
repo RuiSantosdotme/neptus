@@ -284,9 +284,7 @@ public class AutoPlanner extends ConsolePanel {
                     focText.setEnabled(false);
                     widthSen.setEnabled(false);
                     heigthSen.setEnabled(false);
-                    
-                    
-                    
+                                        
                     
                     //Criar Variaveis globais para guardar os dados
                     
@@ -566,25 +564,15 @@ public class AutoPlanner extends ConsolePanel {
                     Focal_len = Float.valueOf(FocusLength);
                     Width = widthSen.getText();
                     Heigth = heigthSen.getText();
-                    
-                  
-                    
-                    
-                  //Criar Variaveis globais para guardar os dados, neste caso ele guarda o que estiver escrito nas caixas de texto
-                    
-                    
+                                        
                     
                 }
             
-                
-               //o codigo deste botao irá fazer o calculo, acho eu ...
-                
+                               
                 float altH = (float) ( (Float.valueOf(GSDInt) * Focal_len * resH ) / (100.0 * Float.valueOf(Width))); 
                 
                 float altV = (float) ((Float.valueOf(GSDInt) * Focal_len * resV ) / (100.0 *Float.valueOf(Heigth) ));
-                
-                          
-                
+                                    
                 System.out.println("resH" + resH);
                 System.out.println("resV"+ resV);
                 
@@ -602,6 +590,14 @@ public class AutoPlanner extends ConsolePanel {
                 
                 altInt = (int) Altitud3;
                 
+                if (altInt < 30)
+                {
+                    altInt =30; 
+                    Altitud3 = (float) 30.0;
+                }
+                
+                
+                
                 AltSen.setText(String.valueOf(altInt));  //Altitud3(altitude) a ser calculado
                 
                 //Calculo Para a distancia entre as retas
@@ -609,6 +605,9 @@ public class AutoPlanner extends ConsolePanel {
                 float coberturaHor = (Altitud3 * Float.valueOf(Width) )/ Focal_len;
                 
                 float coberturaVert = (Altitud3 * Float.valueOf(Heigth) )/ Focal_len;
+                
+                
+                
                 
                 float cob;
                 if (coberturaHor > coberturaVert)
@@ -630,6 +629,7 @@ public class AutoPlanner extends ConsolePanel {
                 
                 PolygonEditor currentInteraction = new PolygonEditor();
                 currentInteraction.setActive(true, renderer);
+              
                 //teste.initInteraction();
                 
                 
