@@ -22,8 +22,8 @@
     &lt;container layoutparam="ins 3" param="w 250px!, h 100%"&gt;
       &lt;container layoutparam="ins 0, filly" param="w 100%, h 100%"&gt;
        &lt;child name="Speed Indicator Panel" param="w 100%, h 10px!, wrap "/&gt;
-       &lt;child name="Auto Planner" param="w 100%, h 315px!, wrap"/&gt; 
-        &lt;container layoutparam="ins 0" param="w 100%, h 70px!, wrap"&gt;
+       &lt;child name="Auto Planner" param="w 100%, h 330px!, wrap"/&gt; 
+        &lt;container layoutparam="ins 0" param="w 100%, h 10px!, wrap"&gt;
           &lt;child name="Plan Control" param="w 50%, h 100%"/&gt;
           &lt;child name="Autopilot Mode Indicator" param="w 50%, h 100%, wrap"/&gt;
         &lt;/container&gt;
