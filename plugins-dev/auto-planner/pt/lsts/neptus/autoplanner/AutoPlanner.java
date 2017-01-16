@@ -457,7 +457,7 @@ public class AutoPlanner extends ConsolePanel {
         
         
         JLabel AngleIdLabel = new JLabel();
-        AngleIdLabel.setText("<html><b>" + I18n.text("Angle: (degrees)") + ": " + 0);
+        AngleIdLabel.setText("<html><b>" + I18n.text("Angle (degrees)") + ": " + 0);
         
         this.add(AngleIdLabel);
         
@@ -487,7 +487,7 @@ public class AutoPlanner extends ConsolePanel {
         JLabel GSDIdLabel = new JLabel();
         GSDIdLabel.setText("<html><b>" + I18n.text("GSD (px/m)") + ": " + 104);
         
-        this.add(AngleIdLabel);
+        this.add(GSDIdLabel);
         
         //Slider para GSD
         
