@@ -1,6 +1,7 @@
 package pt.lsts.neptus.autoplanner;
 
 import pt.lsts.neptus.plugins.uavs.panels.UavHUDPanel;
+import pt.lsts.neptus.renderer2d.StateRenderer2D;
 
 import java.awt.Component;
 
@@ -621,14 +622,26 @@ public class AutoPlanner extends ConsolePanel {
                 System.out.println("h " + coberturaHor);
                 System.out.println("v "+ coberturaVert);
                 System.out.println("d "+ distanciaRetas);
+
+
+                createPlan.setEnabled(false);
+                completePlan.setEnabled(true);
+                
+                StateRenderer2D renderer = new StateRenderer2D();
+                
+                PolygonEditor currentInteraction = new PolygonEditor();
+                currentInteraction.setActive(true, renderer);
+                //teste.initInteraction();
                 
                 
-                
-              
-                
-                    createPlan.setEnabled(false);
-                    completePlan.setEnabled(true);
-                
+//                            disableAllInteractionsBut(fp);
+//                            currentInteraction = new PolygonInteraction(getPivot(), manager, true, getConsole());
+//                            currentInteraction.setAssociatedSwitch(fp);
+                //currentInteraction.setActive(true, renderer);
+                       
+//                            
+//                        
+//                fp.setToolTipText(I18n.text("Add filled polygon"));
                 
                 
             }
@@ -651,7 +664,8 @@ public class AutoPlanner extends ConsolePanel {
                 completePlan.setEnabled(false);
                 
                 PolygonInteraction.realCoordPolygon.CreateGrid(100, 0, 150, 0, 0, 0, null, false, 0, 0,getConsole());
-
+//                currentInteraction.setActive(false, renderer);
+//                currentInteraction = null;
                    
             }
         };
