@@ -544,7 +544,6 @@ public class AutoPlanner extends ConsolePanel {
         
         
        
-       
         
         
         //3 botoes sem funçoes para já
@@ -676,7 +675,8 @@ public class AutoPlanner extends ConsolePanel {
         
         
        
-        
+        completePlan.setEnabled(false);
+
         
         
       
