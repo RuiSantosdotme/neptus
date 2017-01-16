@@ -461,7 +461,7 @@ public class AutoPlanner extends ConsolePanel {
         
         this.add(AngleIdLabel);
         
-        //Slides para angulo
+        //Slider para angulo
         
         angleSlider = new JSlider(JSlider.HORIZONTAL, 0, 90, 0);
         
@@ -469,7 +469,7 @@ public class AutoPlanner extends ConsolePanel {
             @Override
             public void stateChanged(ChangeEvent ce) {
                 System.out.println(((JSlider) ce.getSource()).getValue());
-                AngleIdLabel.setText("<html><b>" + I18n.text("Angle: (degrees)") + ": " + ((JSlider) ce.getSource()).getValue());
+                AngleIdLabel.setText("<html><b>" + I18n.text("Angle (degrees)") + ": " + ((JSlider) ce.getSource()).getValue());
             }
         });
         
@@ -484,48 +484,74 @@ public class AutoPlanner extends ConsolePanel {
         angleSlider.setPaintLabels(true);
         
         
+        JLabel GSDIdLabel = new JLabel();
+        GSDIdLabel.setText("<html><b>" + I18n.text("GSD (px/m)") + ": " + 104);
+        
+        this.add(AngleIdLabel);
+        
+        //Slider para GSD
+        
+        GSDSlider = new JSlider(JSlider.HORIZONTAL, 104, 415, 104);
+        
+        GSDSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent ce) {
+                System.out.println(((JSlider) ce.getSource()).getValue());
+                GSDIdLabel.setText("<html><b>" + I18n.text("GSD (px/m)") + ": " + ((JSlider) ce.getSource()).getValue());
+            }
+        });
+        
+        
+        add(GSDSlider, "wrap");
+        //framesPerSecond.addChangeListener(this);
+        
+      //Turn on labels at major tick marks.
+        GSDSlider.setMajorTickSpacing(100);
+        GSDSlider.setMinorTickSpacing(1);
+        GSDSlider.setPaintTicks(true);
+        GSDSlider.setPaintLabels(true);
         
         //GSD - Usar esta spinbox
         
         
         
         
-        SpinnerModel modelG =
-                new SpinnerNumberModel( 10,     //initial value
-                                        1,   //min
-                                        50, //max
-                                       1); //step
-        
-        GIdValueLabel = new JLabel();
-        GIdValueLabel.setText("");
-        GIdLabel = new JLabel();
-        GIdLabel.setText("<html><b>" + I18n.text("GSD (cm/px)") + ": ");
-        
-        this.add(GIdLabel);
-        
-        spinnerG = new JSpinner(modelG);
-        add(spinnerG);
-        
-       
-        spinnerG.addChangeListener(new ChangeListener() {      
-            @Override
-            public void stateChanged(ChangeEvent e) {
-              // handle click
-                
-                try {
-                    spinnerG.commitEdit();
-                } catch ( java.text.ParseException d ) {  }
-                
-             
-                GSDInt = (int) spinnerG.getValue();
-                
-                System.out.println("GSD: "+ GSDInt);
-                
-               
-            }
-          });
-        
-        this.add(GIdValueLabel, "wrap");
+//        SpinnerModel modelG =
+//                new SpinnerNumberModel( 10,     //initial value
+//                                        1,   //min
+//                                        50, //max
+//                                       1); //step
+//        
+//        GIdValueLabel = new JLabel();
+//        GIdValueLabel.setText("");
+//        GIdLabel = new JLabel();
+//        GIdLabel.setText("<html><b>" + I18n.text("GSD (cm/px)") + ": ");
+//        
+//        this.add(GIdLabel);
+//        
+//        spinnerG = new JSpinner(modelG);
+//        add(spinnerG);
+//        
+//       
+//        spinnerG.addChangeListener(new ChangeListener() {      
+//            @Override
+//            public void stateChanged(ChangeEvent e) {
+//              // handle click
+//                
+//                try {
+//                    spinnerG.commitEdit();
+//                } catch ( java.text.ParseException d ) {  }
+//                
+//             
+//                GSDInt = (int) spinnerG.getValue();
+//                
+//                System.out.println("GSD: "+ GSDInt);
+//                
+//               
+//            }
+//          });
+//        
+//        this.add(GIdValueLabel, "wrap");
         
         
         //Altitude
@@ -571,7 +597,7 @@ public class AutoPlanner extends ConsolePanel {
                     
                 }
             
-<<<<<<< HEAD
+
                 
                //o codigo deste botao irá fazer o calculo, acho eu ...
                 
@@ -581,15 +607,8 @@ public class AutoPlanner extends ConsolePanel {
                 
                 float altV = (float) ((Float.valueOf(GSD) * Focal_len * resV ) / (100.0 *Float.valueOf(Heigth) ));
                 
-                          
-                
-=======
-                               
-                float altH = (float) ( (Float.valueOf(GSDInt) * Focal_len * resH ) / (100.0 * Float.valueOf(Width))); 
-                
-                float altV = (float) ((Float.valueOf(GSDInt) * Focal_len * resV ) / (100.0 *Float.valueOf(Heigth) ));
                                     
->>>>>>> origin/develop
+
                 System.out.println("resH" + resH);
                 System.out.println("resV"+ resV);
                 
@@ -643,15 +662,15 @@ public class AutoPlanner extends ConsolePanel {
                 createPlan.setEnabled(false);
                 completePlan.setEnabled(true);
                 
-<<<<<<< HEAD
-=======
+
+
                 StateRenderer2D renderer = new StateRenderer2D();
                 
                 PolygonEditor currentInteraction = new PolygonEditor();
                 currentInteraction.setActive(true, renderer);
               
                 //teste.initInteraction();
->>>>>>> origin/develop
+
                 
                 
 //                StateRenderer2D renderer = new StateRenderer2D();
