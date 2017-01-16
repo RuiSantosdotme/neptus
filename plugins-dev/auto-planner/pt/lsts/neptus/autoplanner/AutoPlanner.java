@@ -136,7 +136,9 @@ public class AutoPlanner extends ConsolePanel {
     private Map<String, Class<?>> plugins = new LinkedHashMap<String, Class<?>>();
     private ContainerSubPanel container;
     private JTextField focText, heigthSen, widthSen;
+    JButton completePlan;
     JLabel AltSen;
+    int a=0;
     
  
     private JButton createPlan, EditPlan, DelPlan, PausePlan, ResumePlan, EditMode ;
@@ -550,6 +552,7 @@ public class AutoPlanner extends ConsolePanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
+                a= 1;
                 
                 if(selectedCam == "Custom")
                 {
@@ -564,6 +567,7 @@ public class AutoPlanner extends ConsolePanel {
                     Width = widthSen.getText();
                     Heigth = heigthSen.getText();
                     
+                  
                     
                     
                   //Criar Variaveis globais para guardar os dados, neste caso ele guarda o que estiver escrito nas caixas de texto
@@ -620,13 +624,45 @@ public class AutoPlanner extends ConsolePanel {
                 
                 
                 
-                           
+              
+                
+                    createPlan.setEnabled(false);
+                    completePlan.setEnabled(true);
+                
+                
                 
             }
         };
         
         createPlan = new JButton(CreatePlanAction);
         add(createPlan);
+        
+        
+        Action CompletePlanAction = new AbstractAction(I18n.text("Complete Plan")) {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+               
+                 
+                
+                
+                createPlan.setEnabled(true);
+                completePlan.setEnabled(false);
+                
+                PolygonInteraction.realCoordPolygon.CreateGrid(100, 0, 150, 0, 0, 0, null, false, 0, 0,getConsole());
+
+                   
+            }
+        };
+        
+        completePlan = new JButton(CompletePlanAction);
+        add(completePlan, "wrap");
+        
+        
+        
+       
+        
         
         
       
