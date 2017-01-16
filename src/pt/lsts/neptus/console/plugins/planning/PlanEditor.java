@@ -1095,6 +1095,9 @@ public class PlanEditor extends InteractionAdapter implements Renderer2DPainter,
 
                             ManeuverPayloadConfig payloadConfig = new ManeuverPayloadConfig(plan.getVehicle(), pivot,
                                     psp);
+                            
+                         
+                            
                             DefaultProperty[] properties = payloadConfig.getProperties();
 
                             ManeuverPayloadConfig payloadDefaultsConfig = new ManeuverPayloadConfig(plan.getVehicle(),

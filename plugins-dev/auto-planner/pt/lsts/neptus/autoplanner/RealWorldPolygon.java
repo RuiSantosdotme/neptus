@@ -33,6 +33,7 @@ package pt.lsts.neptus.autoplanner;
 
 import pt.lsts.neptus.console.ConsoleLayout;
 import pt.lsts.neptus.mp.templates.PlanCreator;
+import pt.lsts.neptus.params.ManeuverPayloadConfig;
 import pt.lsts.neptus.types.coord.LocationType;
 import pt.lsts.neptus.types.coord.UTMCoordinates;
 import pt.lsts.neptus.types.mission.plan.PlanType;
@@ -416,7 +417,10 @@ public class RealWorldPolygon {
         PlanType plan = pc.getPlan();
         plan.setId("CoveragePlan");
         plan.setVehicle("x8-02");
-        
+
+   
+      
+     
        
 
         console.getConsole().getMission().addPlan(plan);
