@@ -73,6 +73,7 @@ import pt.lsts.neptus.gui.PropertiesEditor;
 import pt.lsts.neptus.gui.PropertiesProvider;
 import pt.lsts.neptus.i18n.I18n;
 import pt.lsts.neptus.plugins.NeptusProperty;
+import pt.lsts.neptus.types.coord.LocationType;
 import pt.lsts.neptus.types.vehicle.VehicleType.SystemTypeEnum;
 import pt.lsts.neptus.util.GuiUtils;
 import pt.lsts.neptus.util.conf.GeneralPreferences;
@@ -128,6 +129,8 @@ public class AutoPlanner extends ConsolePanel {
     private JComboBox<String> CamList;
     private JComboBox<String> ResList;
     private JComboBox<String> VeicList;
+    private JSlider angleSlider;
+    private JSlider GSDSlider;
     private JSpinner spinner, spinnerR;
     private JSpinner spinnerG ;
     private JSpinner spinnerA;
@@ -442,8 +445,8 @@ public class AutoPlanner extends ConsolePanel {
                 String[] tokens = selectedRes.split("x");
 
                 
-                resH = Float.valueOf(tokens[1]);
-                resV = Float.valueOf(tokens[2]);
+                resH = Float.valueOf(tokens[0]);
+                resV = Float.valueOf(tokens[1]);
                 
                
             }
@@ -462,9 +465,9 @@ public class AutoPlanner extends ConsolePanel {
         
         //Slides para angulo
         
-        JSlider framesPerSecond = new JSlider(JSlider.HORIZONTAL, 0, 90, 0);
+        angleSlider = new JSlider(JSlider.HORIZONTAL, 0, 90, 0);
         
-        framesPerSecond.addChangeListener(new ChangeListener() {
+        angleSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent ce) {
                 System.out.println(((JSlider) ce.getSource()).getValue());
@@ -473,14 +476,14 @@ public class AutoPlanner extends ConsolePanel {
         });
         
         
-        add(framesPerSecond, "wrap");
+        add(angleSlider, "wrap");
         //framesPerSecond.addChangeListener(this);
         
       //Turn on labels at major tick marks.
-        framesPerSecond.setMajorTickSpacing(45);
-        framesPerSecond.setMinorTickSpacing(1);
-        framesPerSecond.setPaintTicks(true);
-        framesPerSecond.setPaintLabels(true);
+        angleSlider.setMajorTickSpacing(45);
+        angleSlider.setMinorTickSpacing(1);
+        angleSlider.setPaintTicks(true);
+        angleSlider.setPaintLabels(true);
         
         
         
@@ -580,9 +583,11 @@ public class AutoPlanner extends ConsolePanel {
                 
                //o codigo deste botao irá fazer o calculo, acho eu ...
                 
-                float altH = (float) ( (Float.valueOf(GSDInt) * Focal_len * resH ) / (100.0 * Float.valueOf(Width))); 
+                float GSD = 100*1/((float)GSDInt);
                 
-                float altV = (float) ((Float.valueOf(GSDInt) * Focal_len * resV ) / (100.0 *Float.valueOf(Heigth) ));
+                float altH = (float) ( (Float.valueOf(GSD) * Focal_len * resH ) / (100.0 * Float.valueOf(Width))); 
+                
+                float altV = (float) ((Float.valueOf(GSD) * Focal_len * resV ) / (100.0 *Float.valueOf(Heigth) ));
                 
                           
                 
@@ -623,17 +628,23 @@ public class AutoPlanner extends ConsolePanel {
                 System.out.println("v "+ coberturaVert);
                 System.out.println("d "+ distanciaRetas);
 
-
+                PolygonInteraction.realCoordPolygon.CreateGrid(altInt, 0, distanciaRetas, angleSlider.getValue(), 0, 0, null, false, 0, 0,getConsole());
+                
                 createPlan.setEnabled(false);
                 completePlan.setEnabled(true);
                 
-                StateRenderer2D renderer = new StateRenderer2D();
-                
-                PolygonEditor currentInteraction = new PolygonEditor();
-                currentInteraction.setActive(true, renderer);
-                //teste.initInteraction();
                 
                 
+//                StateRenderer2D renderer = new StateRenderer2D();
+//                
+//                PolygonEditor currentInteraction = new PolygonEditor();
+//                currentInteraction.setActive(true, renderer);
+//                currentInteraction.initInteraction();
+//                
+//                
+//                LocationType cenas1 = renderer.getCenter();
+//                cenas1.convertToAbsoluteLatLonDepth();
+//                
 //                            disableAllInteractionsBut(fp);
 //                            currentInteraction = new PolygonInteraction(getPivot(), manager, true, getConsole());
 //                            currentInteraction.setAssociatedSwitch(fp);
@@ -663,7 +674,7 @@ public class AutoPlanner extends ConsolePanel {
                 createPlan.setEnabled(true);
                 completePlan.setEnabled(false);
                 
-                PolygonInteraction.realCoordPolygon.CreateGrid(100, 0, 150, 0, 0, 0, null, false, 0, 0,getConsole());
+                
 //                currentInteraction.setActive(false, renderer);
 //                currentInteraction = null;
                    
