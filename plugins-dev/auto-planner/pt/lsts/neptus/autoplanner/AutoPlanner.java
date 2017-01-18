@@ -648,7 +648,7 @@ public class AutoPlanner extends ConsolePanel {
                 float cob;
                 if (coberturaHor > coberturaVert)
                     cob = coberturaHor;
-                else 
+                else
                     cob =coberturaVert;
                 
                 distanciaRetas = (float) ( (1-0.3) * cob); 
@@ -662,12 +662,13 @@ public class AutoPlanner extends ConsolePanel {
                 createPlan.setEnabled(false);
                 completePlan.setEnabled(true);
                 
+                ActivatePolygonEditor teste = new ActivatePolygonEditor(getConsole());
+                teste.generatePlan();
 
-
-                StateRenderer2D renderer = new StateRenderer2D();
-                
-                PolygonEditor currentInteraction = new PolygonEditor();
-                currentInteraction.setActive(true, renderer);
+//                StateRenderer2D renderer = new StateRenderer2D();
+//                
+//                PolygonEditor currentInteraction = new PolygonEditor();
+//                currentInteraction.setActive(true, renderer);
               
                 //teste.initInteraction();
 
@@ -711,6 +712,9 @@ public class AutoPlanner extends ConsolePanel {
                 
                 createPlan.setEnabled(true);
                 completePlan.setEnabled(false);
+                
+                ActivatePolygonEditor teste = new ActivatePolygonEditor(getConsole());
+                teste.editPolygon();
                 
                 
 //                currentInteraction.setActive(false, renderer);
