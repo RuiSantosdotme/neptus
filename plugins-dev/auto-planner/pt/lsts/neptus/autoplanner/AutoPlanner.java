@@ -1,96 +1,40 @@
 package pt.lsts.neptus.autoplanner;
 
-import pt.lsts.neptus.plugins.uavs.panels.UavHUDPanel;
-import pt.lsts.neptus.renderer2d.StateRenderer2D;
-
-import java.awt.Component;
-
-import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
-import javax.swing.Action;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
 /**/
 import java.awt.Dimension;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.lang.reflect.AccessibleObject;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Vector;
 
-import javax.swing.JScrollPane;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.text.BadLocationException;
-
-import com.google.common.eventbus.Subscribe;
-import com.rabbitmq.client.Method;
 
 import net.miginfocom.swing.MigLayout;
-import pt.lsts.imc.Abort;
-import pt.lsts.imc.AcousticOperation;
-import pt.lsts.imc.AcousticOperation.OP;
-import pt.lsts.imc.IMCMessage;
 import pt.lsts.imc.PlanControlState;
-import pt.lsts.imc.TextMessage;
-import pt.lsts.neptus.NeptusLog;
-import pt.lsts.neptus.autoplanner.RealWorldPolygon.StartPosition;
-import pt.lsts.neptus.comm.manager.imc.ImcMsgManager;
-import pt.lsts.neptus.comm.manager.imc.ImcSystem;
-import pt.lsts.neptus.comm.manager.imc.ImcSystemsHolder;
-import pt.lsts.neptus.comm.manager.imc.MessageDeliveryListener;
-import pt.lsts.neptus.console.notifications.Notification;
-import pt.lsts.neptus.console.plugins.PluginManager;
-import pt.lsts.neptus.console.plugins.SubPanelChangeEvent.SubPanelChangeAction;
-import pt.lsts.neptus.console.plugins.containers.GroupLayoutContainer;
-import pt.lsts.neptus.console.plugins.containers.LayoutProfileProvider;
-import pt.lsts.neptus.console.plugins.containers.MigLayoutContainer;
-import pt.lsts.neptus.gui.PropertiesEditor;
-import pt.lsts.neptus.gui.PropertiesProvider;
-import pt.lsts.neptus.i18n.I18n;
-import pt.lsts.neptus.plugins.NeptusProperty;
-import pt.lsts.neptus.types.coord.LocationType;
-import pt.lsts.neptus.types.vehicle.VehicleType.SystemTypeEnum;
-import pt.lsts.neptus.util.GuiUtils;
-import pt.lsts.neptus.util.conf.GeneralPreferences;
-/**/
-import pt.lsts.neptus.console.ConsoleInteraction;
-import pt.lsts.neptus.console.ConsoleLayer;
 import pt.lsts.neptus.console.ConsoleLayout;
 import pt.lsts.neptus.console.ConsolePanel;
 import pt.lsts.neptus.console.ContainerSubPanel;
+import pt.lsts.neptus.console.IConsoleInteraction;
+import pt.lsts.neptus.console.notifications.Notification;
+import pt.lsts.neptus.console.plugins.planning.MapPanel;
+import pt.lsts.neptus.i18n.I18n;
 import pt.lsts.neptus.plugins.PluginDescription;
-import pt.lsts.neptus.plugins.PluginsRepository;
-import pt.lsts.neptus.plugins.Popup;
-import pt.lsts.neptus.plugins.Popup.POSITION;
-import pt.lsts.neptus.plugins.map.MapEditor;
-
-import pt.lsts.neptus.plugins.map.interactions.*;
-import pt.lsts.neptus.plugins.uavs.panels.UavHUDPanel;
+import pt.lsts.neptus.plugins.map.interactions.PolygonInteraction;
+import pt.lsts.neptus.renderer2d.InteractionAdapter;
+import pt.lsts.neptus.renderer2d.StateRenderer2D;
+import pt.lsts.neptus.renderer2d.StateRendererInteraction;
+import pt.lsts.neptus.types.map.MapGroup;
 
 /**
  * @author Equipa C - SEAI 2016
@@ -144,6 +88,8 @@ public class AutoPlanner extends ConsolePanel {
     JLabel AltSen;
     int a=0;
     
+    private PolygonEditor editor = null;
+    
  
     private JButton createPlan, EditPlan, DelPlan, PausePlan, ResumePlan, EditMode ;
     
@@ -162,12 +108,18 @@ public class AutoPlanner extends ConsolePanel {
         super(console);
     }
     
+    public static StateRenderer2D getRenderer(ConsoleLayout console) throws Exception {
+        Vector<MapPanel> maps = console.getSubPanelsOfClass(MapPanel.class);
+        if (maps.isEmpty())
+            throw new Exception("There is no map in the console");
+        return maps.firstElement().getRenderer();
+    }
+    
     @Override
     public void initSubPanel() {
         setSize(300, 300);
         this.setLayout(new MigLayout("ins 0"));
-       
-       //
+        
         //código adaptado do PLanControlStatePanel.java
         
         setSize(300, 300);
@@ -578,7 +530,22 @@ public class AutoPlanner extends ConsolePanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-
+              
+                try {
+                    editor = getPolygonEditorInstance();
+                    editor.setActive(true, getRenderer(getConsole()));
+                    activatePolygonEditor(editor);
+                    // clean previous polygon
+                    editor.closePolygon();
+                    
+                    System.out.println("IS NULL: " + (getRenderer(getConsole()) == null));
+                    System.out.println("IS ACTIVE: " + editor.isActive());
+                }
+                catch (Exception e2) {
+                    // TODO Auto-generated catch block
+                    System.out.println("AQUI");
+                    e2.printStackTrace();
+                }
                 a= 1;
                 
                 if(selectedCam == "Custom")
@@ -651,7 +618,7 @@ public class AutoPlanner extends ConsolePanel {
                 else
                     cob =coberturaVert;
                 
-                distanciaRetas = (float) ( (1-0.3) * cob); 
+                distanciaRetas = (float) ( (1-0.3) * cob);
                 
                 System.out.println("h " + coberturaHor);
                 System.out.println("v "+ coberturaVert);
@@ -662,36 +629,9 @@ public class AutoPlanner extends ConsolePanel {
                 createPlan.setEnabled(false);
                 completePlan.setEnabled(true);
                 
-                ActivatePolygonEditor teste = new ActivatePolygonEditor(getConsole());
-                teste.generatePlan();
-
-//                StateRenderer2D renderer = new StateRenderer2D();
-//                
-//                PolygonEditor currentInteraction = new PolygonEditor();
-//                currentInteraction.setActive(true, renderer);
-              
-                //teste.initInteraction();
-
+                getConsole().post(Notification.warning("Instruction", "Double click the map to add Polygon Vertices"));
                 
                 
-//                StateRenderer2D renderer = new StateRenderer2D();
-//                
-//                PolygonEditor currentInteraction = new PolygonEditor();
-//                currentInteraction.setActive(true, renderer);
-//                currentInteraction.initInteraction();
-//                
-//                
-//                LocationType cenas1 = renderer.getCenter();
-//                cenas1.convertToAbsoluteLatLonDepth();
-//                
-//                            disableAllInteractionsBut(fp);
-//                            currentInteraction = new PolygonInteraction(getPivot(), manager, true, getConsole());
-//                            currentInteraction.setAssociatedSwitch(fp);
-                //currentInteraction.setActive(true, renderer);
-                       
-//                            
-//                        
-//                fp.setToolTipText(I18n.text("Add filled polygon"));
                 
                 
             }
@@ -705,7 +645,7 @@ public class AutoPlanner extends ConsolePanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                deactivatePolygonEditor(getPolygonEditorInstance());
                
                  
                 
@@ -713,8 +653,8 @@ public class AutoPlanner extends ConsolePanel {
                 createPlan.setEnabled(true);
                 completePlan.setEnabled(false);
                 
-                ActivatePolygonEditor teste = new ActivatePolygonEditor(getConsole());
-                teste.editPolygon();
+//                ActivatePolygonEditor activador2 = new ActivatePolygonEditor(getConsole());
+//                activador2.editPolygon();
                 
                 
 //                currentInteraction.setActive(false, renderer);
@@ -753,6 +693,48 @@ public class AutoPlanner extends ConsolePanel {
         
         
         
+        
+    }
+    
+    public PolygonEditor getPolygonEditorInstance() {
+        for(IConsoleInteraction tmp : getConsole().getInteractions()) {
+            if(tmp.getClass() == PolygonEditor.class) {
+                return (PolygonEditor) tmp;
+            }
+        }
+        // PlanEditor.class
+        return null;
+    }
+    
+    public MapPanel getMapPanelInstance() {
+        Vector<MapPanel> maps = getConsole().getSubPanelsOfInterface(MapPanel.class);
+        
+        if (maps.isEmpty()) {
+            getConsole().post(Notification.error("Edit Polygon", "Could not fetch map panel"));
+            return null;
+        }
+        
+        
+        return  maps.get(0);
+    }
+ 
+    
+    
+    
+    public void activatePolygonEditor(PolygonEditor polygonEditor) {
+        getMapPanelInstance().setActiveInteraction(polygonEditor);
+    }
+    
+    public void deactivatePolygonEditor(PolygonEditor editor) {
+        System.out.println("AQUI x2");
+        getMapPanelInstance().setActiveInteraction(null);
+        try {
+            editor.setActive(false, getRenderer(getConsole()));
+        }
+        catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         
     }
     

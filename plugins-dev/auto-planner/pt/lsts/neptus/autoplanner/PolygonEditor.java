@@ -41,15 +41,18 @@ import java.awt.geom.Point2D;
 import java.util.Vector;
 
 import javax.swing.JPopupMenu;
+import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
 
 import pt.lsts.neptus.autoplanner.PolygonType.Vertex;
 import pt.lsts.neptus.console.ConsoleInteraction;
+import pt.lsts.neptus.console.ConsoleLayout;
 import pt.lsts.neptus.console.plugins.planning.MapPanel;
 import pt.lsts.neptus.gui.LocationPanel;
 import pt.lsts.neptus.i18n.I18n;
 import pt.lsts.neptus.plugins.NeptusProperty;
 import pt.lsts.neptus.plugins.PluginDescription;
+import pt.lsts.neptus.renderer2d.InteractionAdapter;
 import pt.lsts.neptus.renderer2d.Renderer2DPainter;
 import pt.lsts.neptus.renderer2d.StateRenderer2D;
 import pt.lsts.neptus.types.coord.LocationType;
@@ -66,7 +69,12 @@ public class PolygonEditor extends ConsoleInteraction implements Renderer2DPaint
     protected Vector<MapPanel> maps = new Vector<>();    
     
     @NeptusProperty(name="Polygon color")
-    protected Color polygonColor = Color.green;    
+    protected Color polygonColor = Color.green;
+    
+    public PolygonEditor() {
+        System.out.println("Polygon Editor!");
+    }
+
     
     /**
      * Adds a layer to all map panels that paints the current polygon
@@ -74,6 +82,7 @@ public class PolygonEditor extends ConsoleInteraction implements Renderer2DPaint
     @Override
     public void initInteraction() {
         maps = getConsole().getSubPanelsOfClass(MapPanel.class);
+        System.out.println(maps);
         for (MapPanel p : maps)
             p.addPreRenderPainter(this);
     }
@@ -95,6 +104,10 @@ public class PolygonEditor extends ConsoleInteraction implements Renderer2DPaint
         for (Vertex v : polygon.getVertices())
             poly.insertPoint(new LocationType(v.lat, v.lon));
         return poly;
+    }
+    
+    public void closePolygon() {
+        polygon = new PolygonType();
     }
     
     /**
@@ -138,6 +151,7 @@ public class PolygonEditor extends ConsoleInteraction implements Renderer2DPaint
      */
     @Override
     public void mouseClicked(MouseEvent event, StateRenderer2D source) {
+        System.out.println("Clicaste no ecrã!!!!!!");
         if (!SwingUtilities.isRightMouseButton(event)) {
             if (event.getClickCount() == 2) {
                 LocationType loc = source.getRealWorldLocation(event.getPoint());
