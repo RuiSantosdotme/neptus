@@ -31,14 +31,16 @@
  */
 package pt.lsts.neptus.autoplanner;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.TreeMap;
+
 import pt.lsts.neptus.console.ConsoleLayout;
 import pt.lsts.neptus.mp.templates.PlanCreator;
-import pt.lsts.neptus.params.ManeuverPayloadConfig;
 import pt.lsts.neptus.types.coord.LocationType;
 import pt.lsts.neptus.types.coord.UTMCoordinates;
 import pt.lsts.neptus.types.mission.plan.PlanType;
-
-import java.util.*;
 
 
 /**
@@ -110,22 +112,6 @@ public class RealWorldPolygon {
         return new Rect(minx, maxy, maxx, miny);
     }
     
-    // polar x to rectangular
-//    static double newposx(double x, double bearing, double distance)
-//    {
-//        double degN = 90 - bearing;
-//        if (degN < 0)
-//            degN += 360;
-//        return (x + distance * Math.cos(degN * deg2rad));
-//    }
-//    // polar y to rectangular
-//    static double newposy(double y, double bearing, double distance)
-//    {
-//        double degN = 90 - bearing;
-//        if (degN < 0)
-//            degN += 360;
-//        return (y + distance * Math.sin(degN * deg2rad));
-//    }
     
     double offsetMtoLL(double dn) {
 
@@ -398,13 +384,13 @@ public class RealWorldPolygon {
         return notUsed;
     }
     
-    public void createCoverage(ConsoleLayout console) {
+    public void createCoverage(ConsoleLayout console, int altitude, String veiculo) {
         
         PlanCreator pc = new PlanCreator(console.getConsole().getMission());
         
         pc.setSpeed(16, pt.lsts.neptus.mp.Maneuver.SPEED_UNITS.METERS_PS );
         
-        pc.setZ(AutoPlanner.Altitud3, pt.lsts.neptus.mp.ManeuverLocation.Z_UNITS.ALTITUDE);
+        pc.setZ(altitude, pt.lsts.neptus.mp.ManeuverLocation.Z_UNITS.ALTITUDE);
         
         pc.setLocation(console.getConsole().getMission().getHomeRef());
         
@@ -416,10 +402,7 @@ public class RealWorldPolygon {
         
         PlanType plan = pc.getPlan();
         plan.setId("CoveragePlan");
-        plan.setVehicle("x8-02");
-
-   
-      
+        plan.setVehicle(veiculo);
      
        
 
@@ -428,20 +411,28 @@ public class RealWorldPolygon {
         console.getConsole().setPlan(plan);
         console.getConsole().getMission().save(false);
     }
+    
+//    public void deletePlan(ConsoleLayout console) {
+//        TreeMap<String, PlanType> planos = console.getConsole().getMission().getIndividualPlansList();
+//        
+//        PlanType plaano = planos.get("CoveragePlan");
+//        plaano = null;
+//    }
+    
+    
 
     
-    public List<LocationType> CreateGrid(double altitude, double distance, double spacing, double angle, double overshoot1,double overshoot2, StartPosition startpos, boolean shutter, float minLaneSeparation, float leadin, ConsoleLayout console)
+    public List<LocationType> CreateGrid(int altitude, String veiculo, double spacing, double angle, StartPosition startpos, boolean shutter, ConsoleLayout console)
     {   //spacing em metros
         //DoDebug();
 
         if (spacing < 4 && spacing != 0)
             spacing = 4;
 
-        if (distance < 0.1)
-            distance = 0.1;
-
         if (polygonLL.size() == 0)
             return new ArrayList<LocationType>();
+        
+        angle= Math.toRadians(angle);
         
         while(angle > (Math.PI/2))
             angle=angle-Math.PI;
@@ -449,39 +440,13 @@ public class RealWorldPolygon {
         while(angle <= -(Math.PI/2))
             angle=angle+Math.PI;
 
-        
-        // Make a non round number in case of corner cases
-//        if (minLaneSeparation != 0)
-//            minLaneSeparation += 0.5F;
-//        // Lane Separation in meters
-//        double minLaneSeparationINMeters = minLaneSeparation * distance;
 
-        //List<UTMCoordinates> ans = new ArrayList<UTMCoordinates>();
-
-        // utm zone distance calcs will be done in
-        //int utmzone = polygonLL.get(0).getZoneNumber();
-        
-
-        // utm position list
-//        List<utmpos> utmpositions = utmpos.ToList(PointLatLngAlt.ToUTM(utmzone, polygon), utmzone);
-//
-//        // close the loop if its not already
-//        if (utmpositions[0] != utmpositions[utmpositions.Count - 1])
-//            utmpositions.Add(utmpositions[0]); // make a full loop
-//
-        // get mins/maxs of coverage area ESTÁ ERRADO, O RECTANGULO NÃO TEM OS VARIOS PONTOS LÁ DENTRO
         Rect area = getPolyMinMax(polygonLL);
 
-        // get initial grid
-
-        // used to determine the size of the outer grid area
-        //double diagdist = area.getDiagDistance();
-
-        // somewhere to store out generated lines
         List<LineLLUTM> grid = new ArrayList<LineLLUTM>();
-        // number of lines we need
-        int lines = 0;
         
+        // number of lines
+        int lines = 0;  
         
         
         
@@ -610,7 +575,7 @@ public class RealWorldPolygon {
             
         }
         
-        createCoverage(console);
+        createCoverage(console, altitude, veiculo);
            
 
         return orderedWaypoints;

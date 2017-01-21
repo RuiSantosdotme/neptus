@@ -66,7 +66,8 @@ public class PolygonEditor extends ConsoleInteraction implements Renderer2DPaint
     
     protected PolygonType polygon = new PolygonType();
     protected PolygonType.Vertex vertex = null;
-    protected Vector<MapPanel> maps = new Vector<>();    
+    protected Vector<MapPanel> maps = new Vector<>();
+    public static RealWorldPolygon realCoordPolygon = new RealWorldPolygon();
     
     @NeptusProperty(name="Polygon color")
     protected Color polygonColor = Color.green;
