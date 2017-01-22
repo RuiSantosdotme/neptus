@@ -185,8 +185,8 @@ public class AutoPlanner2 extends ConsolePanel {
         add(EditModeB, "wrap");
       
       
-        
-        
+        PausePlan.setVisible(false);
+        ResumePlan.setVisible(false);
         
         
         
