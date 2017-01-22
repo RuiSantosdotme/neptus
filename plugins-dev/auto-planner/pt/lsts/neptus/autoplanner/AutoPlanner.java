@@ -133,7 +133,7 @@ public class AutoPlanner extends ConsolePanel {
         else
             if (selectedVeic == "Mariner")
             {
-                selectedVeic = "mariner-02";                     
+                selectedVeic = "mariner-01";                     
             }
 
         this.add(nodeIdValueLabel, "wrap");
@@ -153,7 +153,7 @@ public class AutoPlanner extends ConsolePanel {
                 else
                     if (selectedVeic == "Mariner")
                     {
-                        selectedVeic = "mariner-02";                     
+                        selectedVeic = "mariner-01";                     
                     }
 
                 calculateParameters();
