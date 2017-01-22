@@ -44,7 +44,7 @@ import pt.lsts.neptus.types.mission.plan.PlanType;
 
 
 /**
- * @author grifo
+ * @author Equipa C - SEAI 2016
  *
  */
 public class RealWorldPolygon {
