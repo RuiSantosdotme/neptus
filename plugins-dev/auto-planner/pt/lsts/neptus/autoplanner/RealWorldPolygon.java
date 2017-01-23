@@ -388,7 +388,7 @@ public class RealWorldPolygon {
         
         PlanCreator pc = new PlanCreator(console.getConsole().getMission());
         
-        if(veiculo=="x8-02")    
+        if(veiculo.equals("x8-02"))    
             pc.setSpeed(16, pt.lsts.neptus.mp.Maneuver.SPEED_UNITS.METERS_PS );
         else
             pc.setSpeed(4, pt.lsts.neptus.mp.Maneuver.SPEED_UNITS.METERS_PS );

@@ -51,6 +51,11 @@ public class AutoPlanner extends ConsolePanel {
     private JLabel AltIdValueLabel;
     private JLabel AltIdLabel;
 
+    private JLabel GSDIdValueLabel;
+    private JLabel GSDIdLabel;
+    private JLabel GSDLabel;
+
+
     private JLabel stateValueLabel;
     private JLabel stateLabel;
     private JLabel nodeIdValueLabel;
@@ -60,7 +65,7 @@ public class AutoPlanner extends ConsolePanel {
     private JComboBox<String> ResList;
     private JComboBox<String> VeicList;
     private JSlider angleSlider;
-    private JSlider GSDSlider;
+    private JSlider GSDSlider, spacingSlider;
     private JTextField focText, heigthSen, widthSen;
     JLabel AltLabel;
 
@@ -120,7 +125,7 @@ public class AutoPlanner extends ConsolePanel {
 
         //ComboBox para veículo 
 
-        String[] Veiculo = new String[] {"X8 SkyWalker", "Mariner"};
+        String[] Veiculo = new String[] {"Mariner", "X8 SkyWalker"};
 
         VeicList = new JComboBox<>(Veiculo);
         add(VeicList);
@@ -156,8 +161,9 @@ public class AutoPlanner extends ConsolePanel {
                         selectedVeic = "mariner-01";                     
                     }
 
+                updateSpacingSlider();
                 calculateParameters();
-                updateGSDSlider();
+
 
 
             }
@@ -197,6 +203,9 @@ public class AutoPlanner extends ConsolePanel {
                     widthSen.setEnabled(false);
                     heigthSen.setEnabled(false);
 
+                    resH = (float) 640.0;
+                    resV = (float) 480.0;
+
 
                     //Criar Variaveis globais para guardar os dados
 
@@ -212,15 +221,18 @@ public class AutoPlanner extends ConsolePanel {
                 } else 
                     if(selectedCam == "Canon")
                     {
-                        focText.setText("28");
+                        focText.setText("5");
                         widthSen.setText("6.17");
                         heigthSen.setText("4.56");
 
-                        FocusLength = "28";
+                        FocusLength = "5";
                         SensWidth = "6.17";
                         SensHeigth = "4.56";
 
-                        //                        Focal_len = (float) 28;
+                        resH = (float) 640.0;
+                        resV = (float) 480.0;
+
+                        //                        Focal_len = (float) 5;
                         //                        SensWidth_float = (float) 6.17;
                         //                        SensHeigth_float = (float) 4.56;
 
@@ -254,10 +266,9 @@ public class AutoPlanner extends ConsolePanel {
 
 
                         }
-
-
+                updateSpacingSlider();
                 calculateParameters();
-                updateGSDSlider();
+
 
 
 
@@ -299,9 +310,9 @@ public class AutoPlanner extends ConsolePanel {
                 //                Focal_len = Float.valueOf(FocusLength);
                 //                SensWidth_float = Float.valueOf(SensWidth);
                 //                SensHeigth_float = Float.valueOf(SensHeigth);
-
+                updateSpacingSlider();
                 calculateParameters();
-                updateGSDSlider();
+
 
             }
         };
@@ -336,9 +347,9 @@ public class AutoPlanner extends ConsolePanel {
                 //                Focal_len = Float.valueOf(FocusLength);
                 //                SensWidth_float = Float.valueOf(SensWidth);
                 //                SensHeigth_float = Float.valueOf(SensHeigth);
-
+                updateSpacingSlider();
                 calculateParameters();
-                updateGSDSlider();
+
 
             }
         };
@@ -373,63 +384,94 @@ public class AutoPlanner extends ConsolePanel {
                 //                Focal_len = Float.valueOf(FocusLength);
                 //                SensWidth_float = Float.valueOf(SensWidth);
                 //                SensHeigth_float = Float.valueOf(SensHeigth);
-
+                updateSpacingSlider();
                 calculateParameters();
-                updateGSDSlider();
+
 
             }
         };
 
         heigthSen.addActionListener(SensHeigth_Listener);
 
+        //Distancia entre rectas
+
+        JLabel SpacingLabel = new JLabel();
+        SpacingLabel.setText("<html><b>" + I18n.text("Spacing (m)") + ": " + 0);
+
+        this.add(SpacingLabel);
+
+
+        //Slider para spacing
+        spacingSlider = new JSlider(JSlider.HORIZONTAL, 0, 0, 0);
+
+        spacingSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent ce) {
+                System.out.println(((JSlider) ce.getSource()).getValue());
+                SpacingLabel.setText("<html><b>" + I18n.text("Spacing (m)") + ": " + ((JSlider) ce.getSource()).getValue());
+                distanciaRetas = (float) ((JSlider) ce.getSource()).getValue();
+                calculateParameters(distanciaRetas);
+            }
+        });
+
+
+        add(spacingSlider, "wrap");
+        //framesPerSecond.addChangeListener(this);
+
+        //Turn on labels at major tick marks.
+        //spacingSlider.setMajorTickSpacing(45);
+        spacingSlider.setMinorTickSpacing(1);
+        spacingSlider.setPaintTicks(true);
+        spacingSlider.setPaintLabels(true);
+
 
         //Resolution Combobox
 
-        ResIdValueLabel = new JLabel();
-        ResIdValueLabel.setText("");
-        ResIdLabel = new JLabel();
-        ResIdLabel.setText("<html><b>" + I18n.text("Resolution") + ": ");
-
-        this.add(ResIdLabel);
-
-        String[] res = new String[] {"640x480", "1024x780", "1600x1200"};
-
-
-
-        ResList = new JComboBox<>(res);
-        add(ResList);
-        //  selectedRes = (String) ResList.getSelectedItem();
-
-
-
-
-        resH = (float) 640.0;
-        resV = (float) 480.0;
-
-
-        this.add(ResIdValueLabel,"wrap");
-
-        ActionListener ResActionListener = new ActionListener() { //add actionlistner to listen for change
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                selectedRes= (String) ResList.getSelectedItem();
-
-                String[] tokens = selectedRes.split("x");
-
-
-                resH = Float.valueOf(tokens[0]);
-                resV = Float.valueOf(tokens[1]);
-
-                calculateParameters();
-                updateGSDSlider();
-
-
-            }
-
-        };
-
-        ResList.addActionListener(ResActionListener);
+        //        ResIdValueLabel = new JLabel();
+        //        ResIdValueLabel.setText("");
+        //        ResIdLabel = new JLabel();
+        //        ResIdLabel.setText("<html><b>" + I18n.text("Resolution") + ": ");
+        //
+        //        this.add(ResIdLabel);
+        //
+        //        String[] res = new String[] {"640x480", "1024x780", "1600x1200"};
+        //
+        //
+        //
+        //        ResList = new JComboBox<>(res);
+        //        add(ResList);
+        //        //  selectedRes = (String) ResList.getSelectedItem();
+        //
+        //
+        //
+        //
+        //        resH = (float) 640.0;
+        //        resV = (float) 480.0;
+        //
+        //
+        //        this.add(ResIdValueLabel,"wrap");
+        //
+        //        ActionListener ResActionListener = new ActionListener() { //add actionlistner to listen for change
+        //            @Override
+        //            public void actionPerformed(ActionEvent e) {
+        //
+        //                selectedRes= (String) ResList.getSelectedItem();
+        //
+        //                String[] tokens = selectedRes.split("x");
+        //
+        //
+        //                resH = Float.valueOf(tokens[0]);
+        //                resV = Float.valueOf(tokens[1]);
+        //
+        //                calculateParameters();
+        //                updateGSDSlider();
+        //
+        //
+        //            }
+        //
+        //        };
+        //
+        //        ResList.addActionListener(ResActionListener);
 
 
 
@@ -441,7 +483,7 @@ public class AutoPlanner extends ConsolePanel {
 
         //Slider para angulo
 
-        angleSlider = new JSlider(JSlider.HORIZONTAL, 0, 90, 0);
+        angleSlider = new JSlider(JSlider.HORIZONTAL, -90, 90, 0);
 
         angleSlider.addChangeListener(new ChangeListener() {
             @Override
@@ -463,34 +505,51 @@ public class AutoPlanner extends ConsolePanel {
         angleSlider.setPaintLabels(true);
 
 
-        JLabel GSDIdLabel = new JLabel();
-        GSDIdLabel.setText("<html><b>" + I18n.text("GSD (px/m)") + ": " + 104);
+        //GSD
+
+
+        //Altitude
+
+        GSDIdValueLabel = new JLabel();
+        GSDIdValueLabel.setText("");
+        GSDIdLabel = new JLabel();
+        GSDIdLabel.setText("<html><b>" + I18n.text("GSD (px/m)") + ": ");
 
         this.add(GSDIdLabel);
 
-        //Slider para GSD
+        GSDLabel= new JLabel();
 
-        GSDSlider = new JSlider(JSlider.HORIZONTAL, 0, 0, 0);
+        GSDLabel.setPreferredSize( new Dimension( 40, 24 ) );
 
-        GSDSlider.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent ce) {
-                System.out.println(((JSlider) ce.getSource()).getValue());
-                GSDIdLabel.setText("<html><b>" + I18n.text("GSD (px/m)") + ": " + ((JSlider) ce.getSource()).getValue());
-                GSD = (float) ((JSlider) ce.getSource()).getValue();
-                calculateParameters(GSD);
-            }
-        });
-
-
-        add(GSDSlider, "wrap");
-        //framesPerSecond.addChangeListener(this);
-
-        //Turn on labels at major tick marks.
-        //GSDSlider.setMajorTickSpacing(0);
-        GSDSlider.setMinorTickSpacing(1);
-        GSDSlider.setPaintTicks(true);
-        GSDSlider.setPaintLabels(true);
+        this.add(GSDLabel,"wrap");
+        //        JLabel GSDIdLabel = new JLabel();
+        //        GSDIdLabel.setText("<html><b>" + I18n.text("GSD (px/m)") + ": " + 0);
+        //
+        //        this.add(GSDIdLabel);
+        //
+        //        //Slider para GSD
+        //
+        //        GSDSlider = new JSlider(JSlider.HORIZONTAL, 0, 0, 0);
+        //
+        //        GSDSlider.addChangeListener(new ChangeListener() {
+        //            @Override
+        //            public void stateChanged(ChangeEvent ce) {
+        //                System.out.println(((JSlider) ce.getSource()).getValue());
+        //                GSDIdLabel.setText("<html><b>" + I18n.text("GSD (px/m)") + ": " + ((JSlider) ce.getSource()).getValue());
+        //                GSD = (float) ((JSlider) ce.getSource()).getValue();
+        //                calculateParameters(GSD);
+        //            }
+        //        });
+        //
+        //
+        //        add(GSDSlider, "wrap");
+        //        //framesPerSecond.addChangeListener(this);
+        //
+        //        //Turn on labels at major tick marks.
+        //        //GSDSlider.setMajorTickSpacing(0);
+        //        GSDSlider.setMinorTickSpacing(1);
+        //        GSDSlider.setPaintTicks(true);
+        //        GSDSlider.setPaintLabels(true);
 
         //Altitude
 
@@ -610,7 +669,7 @@ public class AutoPlanner extends ConsolePanel {
 
 
         //Button Delete Everything
-        Action DeleteEverythingAction = new AbstractAction(I18n.text("Delete Everything")) {
+        Action DeleteEverythingAction = new AbstractAction(I18n.text("Delete Polygon")) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -647,23 +706,25 @@ public class AutoPlanner extends ConsolePanel {
 
 
         // Canon como camera pre definida
-        focText.setText("28");
+        focText.setText("5");
         widthSen.setText("6.17");
         heigthSen.setText("4.56");
 
-        FocusLength = "28";
+        FocusLength = "5";
         SensWidth = "6.17";
         SensHeigth = "4.56";
+        
+        resH = (float) 640.0;
+        resV = (float) 480.0;        
 
 
         focText.setEnabled(false);
         widthSen.setEnabled(false);
         heigthSen.setEnabled(false);
 
-
-
+        updateSpacingSlider();
         calculateParameters();
-        updateGSDSlider();
+
 
 
     }
@@ -719,27 +780,31 @@ public class AutoPlanner extends ConsolePanel {
         float fl = Float.valueOf(FocusLength);
         float sw = Float.valueOf(SensWidth);
         //float sh = Float.valueOf(SensHeigth);
+        
+        
+        double cobH = distanciaRetas/0.7;
+        double altH =(cobH*fl)/(sw);
+        double GSD = (1/(cobH/resH));
 
-        GSD_cm_px = 100*1/((float) GSDSlider.getValue());
-
-        float altH = (float) ( (Float.valueOf(GSD_cm_px) * fl * resH ) / (100.0 * sw)); 
+        //GSD_cm_px = 100*1/((float) GSDSlider.getValue());
 
         altInt = (int) altH;
 
         AltLabel.setText(String.valueOf(altInt));  //Altitud3(altitude) a ser calculado
-
+        GSDLabel.setText(String.valueOf(Math.round(GSD*100.0)/100.0));
+        
         //Calculo Para a distancia entre as retas
 
-        float coberturaHor = (altH * sw )/ fl;
+//        float coberturaHor = (altH * sw )/ fl;
 
         //Para utilizar caso seja implementado a funcionalidade de controlo de velocidade/tempo para as definir o tempo entre as fotogorafias
         //float coberturaVert = (Altitud3 * sh )/ Focal_len;
 
-        distanciaRetas = (float) ( 0.7 * coberturaHor);
+//        distanciaRetas = (float) ( 0.7 * coberturaHor);
 
     }
-
-    public void calculateParameters(float GSDnoS) {
+    
+    public void calculateParameters(float distRetas) {
 
         FocusLength = focText.getText();
         SensWidth = widthSen.getText();
@@ -748,29 +813,61 @@ public class AutoPlanner extends ConsolePanel {
         float fl = Float.valueOf(FocusLength);
         float sw = Float.valueOf(SensWidth);
         //float sh = Float.valueOf(SensHeigth);
+        
+        
+        double cobH = distRetas/0.7;
+        double altH =(cobH*fl)/(sw);
+        double GSD = (1/(cobH/resH));
 
-        GSD_cm_px = 100*1/((float) GSDnoS);
-
-        float altH = (float) ( (Float.valueOf(GSD_cm_px) * fl * resH ) / (100.0 * sw)); 
+        //GSD_cm_px = 100*1/((float) GSDSlider.getValue());
 
         altInt = (int) altH;
 
         AltLabel.setText(String.valueOf(altInt));  //Altitud3(altitude) a ser calculado
-
+        GSDLabel.setText(String.valueOf(Math.round(GSD*100.0)/100.0));
+        
         //Calculo Para a distancia entre as retas
 
-        float coberturaHor = (altH * sw )/ fl;
+//        float coberturaHor = (altH * sw )/ fl;
 
         //Para utilizar caso seja implementado a funcionalidade de controlo de velocidade/tempo para as definir o tempo entre as fotogorafias
         //float coberturaVert = (Altitud3 * sh )/ Focal_len;
 
-        distanciaRetas = (float) ( 0.7 * coberturaHor);
-        int kjdgfksdf = 0;
+//        distanciaRetas = (float) ( 0.7 * coberturaHor);
+
     }
+
+    //    public void calculateParameters(float GSDnoS) {
+    //
+    //        FocusLength = focText.getText();
+    //        SensWidth = widthSen.getText();
+    //        SensHeigth = heigthSen.getText();
+    //
+    //        float fl = Float.valueOf(FocusLength);
+    //        float sw = Float.valueOf(SensWidth);
+    //        //float sh = Float.valueOf(SensHeigth);
+    //
+    //        GSD_cm_px = 100*1/((float) GSDnoS);
+    //
+    //        float altH = (float) ( (Float.valueOf(GSD_cm_px) * fl * resH ) / (100.0 * sw)); 
+    //
+    //        altInt = (int) altH;
+    //
+    //        AltLabel.setText(String.valueOf(altInt));  //Altitud3(altitude) a ser calculado
+    //
+    //        //Calculo Para a distancia entre as retas
+    //
+    //        float coberturaHor = (altH * sw )/ fl;
+    //
+    //        //Para utilizar caso seja implementado a funcionalidade de controlo de velocidade/tempo para as definir o tempo entre as fotogorafias
+    //        //float coberturaVert = (Altitud3 * sh )/ Focal_len;
+    //
+    //        distanciaRetas = (float) ( 0.7 * coberturaHor);
+    //    }
 
 
     //public static float distanciaRetas, resH, resV, Focal_len, SensWidth_float, SensHeigth_float, Altitud3, GSD, angle;
-    public void updateGSDSlider() {
+    public void updateSpacingSlider() {
         FocusLength = focText.getText();
         SensWidth = widthSen.getText();
         SensHeigth = heigthSen.getText();
@@ -780,33 +877,60 @@ public class AutoPlanner extends ConsolePanel {
         //float sh = Float.valueOf(SensHeigth);
 
 
-        int GSDnoSlider = GSDSlider.getValue();
-        float GSDSliderMin = ((120*100*sw)/(fl*resH));
-        float GSDSliderMax = ((30*100*sw)/(fl*resH));
+        int SpacingnoSlider = spacingSlider.getValue();
+        double SpacingSliderMax = ((120*0.7*sw)/(fl));
+        double SpacingSliderMin = ((30*0.7*sw)/(fl));
 
-        GSDSliderMin = 1/(GSDSliderMin/100);
-        GSDSliderMax = 1/(GSDSliderMax/100);        
+        //        SpacingSliderMin = 1/(SpacingSliderMin/100);
+        //        SpacingSliderMax = 1/(SpacingSliderMax/100);        
 
-        int min = (int) Math.ceil(GSDSliderMin);
-        int max = (int) Math.floor(GSDSliderMax);
+        int min = (int) Math.ceil(SpacingSliderMin);
+        int max = (int) Math.floor(SpacingSliderMax);
         int tick = (int)(max-min)/2;
 
-        System.out.println(GSDnoSlider + "  " + GSDSliderMin + "  " + GSDSliderMax + "  " + min + "  " + max + " " + tick);
+        System.out.println(SpacingnoSlider + "  " + SpacingSliderMin + "  " + SpacingSliderMax + "  " + min + "  " + max + " " + tick);
 
 
-        GSDSlider.setMinimum(min);
-        GSDSlider.setMaximum(max);
+        if(selectedVeic.equals("x8-02")) {
+            if(min<50) {
+                spacingSlider.setMinimum(50);
+            } else {
+                spacingSlider.setMinimum(min);
+            }
+
+            if(max<50) {
+                spacingSlider.setMaximum(50);
+            } else {
+                spacingSlider.setMaximum(max);
+            }
+        } else if(selectedVeic.equals("mariner-01")) {
+            if(min<5) {
+                spacingSlider.setMinimum(5);
+            } else {
+                spacingSlider.setMinimum(min);
+            }
+
+            if(max<5) {
+                spacingSlider.setMaximum(5);
+            } else {
+                spacingSlider.setMaximum(max);
+            }
+        }
+        //        spacingSlider.setMinimum(min);
+        //        spacingSlider.setMaximum(max);
 
 
-        if(GSDnoSlider < min) {
-            GSDSlider.setValue(min);
-        }else if(GSDnoSlider > max) {
-            GSDSlider.setValue(max);
+        if(SpacingnoSlider < min) {
+            spacingSlider.setValue(min);
+        }else if(SpacingnoSlider > max) {
+            spacingSlider.setValue(max);
         }else {
-            GSDSlider.setValue(GSDnoSlider);
+            spacingSlider.setValue(SpacingnoSlider);
         }
         //        GSDSlider.setMajorTickSpacing(100);
         //        GSDSlider.setMinorTickSpacing(1);
+        
+        distanciaRetas = spacingSlider.getValue();
 
     }
 
