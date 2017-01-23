@@ -203,8 +203,8 @@ public class AutoPlanner extends ConsolePanel {
                     widthSen.setEnabled(false);
                     heigthSen.setEnabled(false);
 
-                    resH = (float) 640.0;
-                    resV = (float) 480.0;
+                    resH = (float) 4064.0;
+                    resV = (float) 2704.0;
 
 
                     //Criar Variaveis globais para guardar os dados
@@ -229,8 +229,8 @@ public class AutoPlanner extends ConsolePanel {
                         SensWidth = "6.17";
                         SensHeigth = "4.56";
 
-                        resH = (float) 640.0;
-                        resV = (float) 480.0;
+                        resH = (float) 4320.0;
+                        resV = (float) 3240.0;
 
                         //                        Focal_len = (float) 5;
                         //                        SensWidth_float = (float) 6.17;
@@ -258,6 +258,9 @@ public class AutoPlanner extends ConsolePanel {
                             //                            Focal_len = Float.valueOf(FocusLength);
                             //                            SensWidth_float = Float.valueOf(SensWidth);
                             //                            SensHeigth_float = Float.valueOf(SensHeigth);
+                            
+                            resH = (float) 4320.0;
+                            resV = (float) 3240.0;
 
                             focText.setEnabled(true);
                             widthSen.setEnabled(true);
@@ -714,8 +717,8 @@ public class AutoPlanner extends ConsolePanel {
         SensWidth = "6.17";
         SensHeigth = "4.56";
         
-        resH = (float) 640.0;
-        resV = (float) 480.0;        
+        resH = (float) 4320.0;
+        resV = (float) 3240.0;        
 
 
         focText.setEnabled(false);
